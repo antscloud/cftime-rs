@@ -2,8 +2,13 @@
 name = "cftime-rs"
 version = "0.1.0"
 edition = "2021"
-
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+authors = ["Antoine Gibek"]
+categories = ["command-line-utilities"]
+description = "Rust implementation of cftime"
+keywords = ["cftime", "cf-conventions", "climate", "netcdf", "meteorology"]
+license = "AGPL-3.0"
+readme = "README.md"
+repository = "https://github.com/antscloud/cftime-rs"
 
 [dependencies]
 chrono = "0.4.31"
