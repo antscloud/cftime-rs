@@ -318,19 +318,12 @@ mod tests {
         ];
         for cal in cals {
             let d = CFDatetime::from_timestamp(-1, 0, cal);
-            println!("{}", cal);
             assert_eq!((1969, 12, 31, 23, 59, 59), d.unwrap().ymd_hms().unwrap());
         }
     }
     #[test]
     fn test_timestamp_limit_gregorian_julian() {
         // -12219206400 == 1582, 10, 15 in Gregorian calendar
-        println!(
-            "{}",
-            CFDatetime::from_ymd(1582, 10, 15, Calendar::Standard)
-                .unwrap()
-                .timestamp()
-        );
         let lower_limit_gregorian = CFDatetime::from_timestamp(-12219292800, 0, Calendar::Standard);
         let upper_limit_julian = CFDatetime::from_timestamp(-12219292801, 0, Calendar::Standard);
         assert_eq!(
@@ -372,7 +365,6 @@ mod tests {
                 let (year, month, day) = date;
                 let datetime: CFDatetime = CFDatetime::from_ymd(year, month, day, cal).unwrap();
                 let (expected_year, expected_month, expected_day) = datetime.ymd().unwrap();
-                println!("{} {} {}", expected_year, expected_month, expected_day);
                 assert_eq!(expected_year, year);
                 assert_eq!(expected_month, month);
                 assert_eq!(expected_day, day);

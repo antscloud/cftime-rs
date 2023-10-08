@@ -16,12 +16,7 @@ pub enum Calendar {
 }
 
 impl std::fmt::Display for Calendar {
-    // This trait requires `fmt` with this exact signature.
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        // Write strictly the first element into the supplied output
-        // stream: `f`. Returns `fmt::Result` which indicates whether the
-        // operation succeeded or failed. Note that `write!` uses syntax which
-        // is very similar to `println!`.
         let name = match *self {
             Calendar::Gregorian => "Gregorian",
             Calendar::Standard => "Standard",

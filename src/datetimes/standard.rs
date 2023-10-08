@@ -76,8 +76,10 @@ impl CalendarDatetimeCreator for StandardDatetime {
         second: f32,
     ) -> Result<Self, crate::errors::Error> {
         let (mut timestamp, nanoseconds) = get_timestamp_from_hms(hour, minute, second)?;
-        if year == 1582 && month == 10 && ((day == 4 && (hour > 0 || minute > 0 || second > 0.0)) || (5..15).contains(&day)) {
-            println!("{} {} {} {} {} {}", year, month, day, hour, minute, second);
+        if year == 1582
+            && month == 10
+            && ((day == 4 && (hour > 0 || minute > 0 || second > 0.0)) || (5..15).contains(&day))
+        {
             return Err(crate::errors::Error::InvalidDate(
                 "Date between 1582-10-04 and 1582-10-15 are not defined in the standard calendar"
                     .to_string(),
