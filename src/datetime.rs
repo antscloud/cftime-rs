@@ -155,6 +155,24 @@ impl CFDatetime {
     }
 }
 
+impl std::fmt::Display for CFDatetime {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        let nanoseconds = self.nanoseconds() as f64 / 1_000_000_000.;
+        match self.ymd_hms() {
+            Ok((year, month, day, hour, minute, second)) => {
+                write!(
+                    f,
+                    "{:04}-{:02}-{:02} {:02}:{:02}:{:02}.{:03}",
+                    year, month, day, hour, minute, second, nanoseconds
+                )
+            }
+            Err(err) => {
+                write!(f, "{:?}", err)
+            }
+        }
+    }
+}
+
 impl std::ops::Add<CFDuration> for CFDatetime {
     type Output = Result<CFDatetime, crate::errors::Error>;
     fn add(self, rhs: CFDuration) -> Self::Output {
