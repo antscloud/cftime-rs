@@ -36,7 +36,7 @@ impl CFDuration {
 
     pub fn from_months(months: i64, calendar: Calendar) -> CFDuration {
         let seconds_for_one_year = CFDuration::from_years(1, calendar).seconds;
-        Self::new(seconds_for_one_year / months, 0, calendar)
+        Self::new(seconds_for_one_year / 12 * months, 0, calendar)
     }
     pub fn from_weeks(weeks: i64, calendar: Calendar) -> CFDuration {
         Self::new(weeks * 7 * 24 * 60 * 60, 0, calendar)
@@ -54,10 +54,10 @@ impl CFDuration {
         Self::new(seconds, 0, calendar)
     }
     pub fn from_milliseconds(milliseconds: i64, calendar: Calendar) -> CFDuration {
-        Self::new(0, milliseconds * 1_000, calendar)
+        Self::new(0, milliseconds * 1_000_000, calendar)
     }
     pub fn from_microseconds(microseconds: i64, calendar: Calendar) -> CFDuration {
-        Self::new(1, 1_000_000 * microseconds, calendar)
+        Self::new(0, 1_000 * microseconds, calendar)
     }
     pub fn from_nanoseconds(nanoseconds: i64, calendar: Calendar) -> CFDuration {
         Self::new(0, nanoseconds, calendar)
@@ -73,7 +73,7 @@ impl CFDuration {
         }
     }
     pub fn months(&self) -> f64 {
-        self.years() / 12.
+        self.years() * 12.
     }
     pub fn weeks(&self) -> f64 {
         self.days() / 7.
@@ -97,7 +97,7 @@ impl CFDuration {
         self.seconds() * 1e6
     }
     pub fn nanoseconds(&self) -> f64 {
-        self.seconds as f64 * 1e9 + self.nanoseconds as f64
+        (self.seconds * 1_000_000_000 + self.nanoseconds as i64) as f64
     }
 }
 
@@ -241,37 +241,52 @@ mod tests {
             calendars::Calendar::Day365,
             calendars::Calendar::Day366,
         ];
-        for cal in cals {
-            let duration = CFDuration::from_years(1, cal);
-            let duration_result = duration.years();
-            assert_eq!(duration_result, 1.0);
-            let duration = CFDuration::from_months(1, cal);
-            let duration_result = duration.months();
-            assert_eq!(duration_result, 1.0);
+        for cal in cals.clone() {
+            println!("{}", cal);
+            println!("Week");
             let duration = CFDuration::from_weeks(1, cal);
             let duration_result = duration.weeks();
             assert_eq!(duration_result, 1.0);
+            println!("Day");
             let duration = CFDuration::from_days(1, cal);
             let duration_result = duration.days();
             assert_eq!(duration_result, 1.0);
+            println!("Hours");
             let duration = CFDuration::from_hours(1, cal);
             let duration_result = duration.hours();
             assert_eq!(duration_result, 1.0);
+            println!("Minutes");
             let duration = CFDuration::from_minutes(1, cal);
             let duration_result = duration.minutes();
             assert_eq!(duration_result, 1.0);
+            println!("Seconds");
             let duration = CFDuration::from_seconds(1, cal);
             let duration_result = duration.seconds();
             assert_eq!(duration_result, 1.0);
+            println!("Milliseconds");
             let duration = CFDuration::from_milliseconds(1, cal);
             let duration_result = duration.milliseconds();
             assert_eq!(duration_result, 1.0);
+            println!("Microseconds");
             let duration = CFDuration::from_microseconds(1, cal);
             let duration_result = duration.microseconds();
             assert_eq!(duration_result, 1.0);
+            println!("Nanoseconds");
             let duration = CFDuration::from_nanoseconds(1, cal);
             let duration_result = duration.nanoseconds();
             assert_eq!(duration_result, 1.0);
+        }
+        // Years and month are not exact so we need to test by omparing with an epsilon
+        let epsilon = 1e-6;
+        for cal in cals {
+            println!("Year");
+            let duration = CFDuration::from_years(1, cal);
+            let duration_result = duration.years();
+            assert!((duration_result - 1.0).abs() < epsilon);
+            println!("Month");
+            let duration = CFDuration::from_months(1, cal);
+            let duration_result = duration.months();
+            assert!((duration_result - 1.0).abs() < epsilon);
         }
     }
 }

@@ -294,6 +294,7 @@ pub fn get_datetime_and_unit_from_units(
 /// # Examples
 ///
 /// ```
+/// use cftime_rs::utils::normalize_nanoseconds;
 /// let nanoseconds = 1_500_000_000;
 /// let (seconds, remaining_nanoseconds) = normalize_nanoseconds(nanoseconds);
 /// assert_eq!(seconds, 1);
@@ -301,6 +302,7 @@ pub fn get_datetime_and_unit_from_units(
 /// ```
 ///
 /// ```
+/// use cftime_rs::utils::normalize_nanoseconds;
 /// let nanoseconds = -2_500_000_000;
 /// let (seconds, remaining_nanoseconds) = normalize_nanoseconds(nanoseconds);
 /// assert_eq!(seconds, -3);
@@ -321,6 +323,7 @@ pub fn normalize_nanoseconds(nanoseconds: i64) -> (i64, u32) {
     };
     (remaining_seconds, remaining_nanoseconds as u32)
 }
+
 /// Converts a unit of time to its corresponding encoded value.
 ///
 /// # Arguments
