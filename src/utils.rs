@@ -1,7 +1,10 @@
 use crate::{
     calendars::Calendar,
     constants,
+    datetime::CFDatetime,
     datetimes::traits::{CalendarDatetime, IsLeap},
+    duration::CFDuration,
+    parser::{parse_cf_time, Unit},
 };
 use std::time::Duration;
 
@@ -262,4 +265,84 @@ pub fn get_timestamp_from_hms(
         % constants::SECS_PER_DAY;
 
     Ok((total_seconds as i64, nanoseconds))
+}
+
+pub fn get_datetime_and_unit_from_units(
+    units: &str,
+    calendar: Calendar,
+) -> Result<(CFDatetime, Unit), crate::errors::Error> {
+    let parsed_cf_time = parse_cf_time(units)?;
+    let (year, month, day) = parsed_cf_time.datetime.ymd;
+    let (hour, minute, second) = match parsed_cf_time.datetime.hms {
+        Some(hms) => (hms.0, hms.1, hms.2),
+        None => (0, 0, 0.0),
+    };
+    let cf_datetime = CFDatetime::from_ymd_hms(year, month, day, hour, minute, second, calendar)?;
+    let unit = parsed_cf_time.unit;
+    Ok((cf_datetime, unit))
+}
+/// Normalize the given number of nanoseconds into seconds and remaining nanoseconds.
+///
+/// # Arguments
+///
+/// * `nanoseconds` - The number of nanoseconds to normalize.
+///
+/// # Returns
+///
+/// A tuple containing the remaining seconds and remaining nanoseconds.
+///
+/// # Examples
+///
+/// ```
+/// let nanoseconds = 1_500_000_000;
+/// let (seconds, remaining_nanoseconds) = normalize_nanoseconds(nanoseconds);
+/// assert_eq!(seconds, 1);
+/// assert_eq!(remaining_nanoseconds, 500_000_000);
+/// ```
+///
+/// ```
+/// let nanoseconds = -2_500_000_000;
+/// let (seconds, remaining_nanoseconds) = normalize_nanoseconds(nanoseconds);
+/// assert_eq!(seconds, -3);
+/// assert_eq!(remaining_nanoseconds, 500_000_000);
+/// ```
+pub fn normalize_nanoseconds(nanoseconds: i64) -> (i64, u32) {
+    // Calculate the number of remaining seconds
+    let mut remaining_seconds = nanoseconds / 1e9 as i64;
+
+    // Calculate the number of remaining nanoseconds
+    let mut remaining_nanoseconds = 0;
+    if remaining_seconds < 0 {
+        // If the remaining seconds is negative, subtract 1 and calculate the remaining nanoseconds accordingly
+        remaining_seconds -= 1;
+        remaining_nanoseconds =
+            (nanoseconds + (remaining_seconds.abs() * 1_000_000_000)) % 1_000_000_000;
+    } else {
+        // If the remaining seconds is positive or zero, calculate the remaining nanoseconds directly
+        remaining_nanoseconds = nanoseconds % 1e9 as i64;
+    }
+    (remaining_seconds, remaining_nanoseconds as u32)
+}
+/// Converts a unit of time to its corresponding encoded value.
+///
+/// # Arguments
+///
+/// * `unit` - The unit of time to encode.
+/// * `duration` - The duration to encode.
+///
+/// # Returns
+///
+/// The encoded value of the unit of time.
+pub fn unit_to_encode(unit: &Unit, duration: CFDuration) -> f64 {
+    match unit {
+        Unit::Year => duration.years(),               // Convert to years
+        Unit::Month => duration.months(),             // Convert to months
+        Unit::Day => duration.days(),                 // Convert to days
+        Unit::Hour => duration.hours(),               // Convert to hours
+        Unit::Minute => duration.minutes(),           // Convert to minutes
+        Unit::Second => duration.seconds(),           // Convert to seconds
+        Unit::Millisecond => duration.milliseconds(), // Convert to milliseconds
+        Unit::Microsecond => duration.microseconds(), // Convert to microseconds
+        Unit::Nanosecond => duration.nanoseconds(),   // Convert to nanoseconds
+    }
 }

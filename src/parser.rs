@@ -16,15 +16,15 @@ pub enum Unit {
 impl Unit {
     pub fn to_duration(&self, calendar: Calendar) -> CFDuration {
         match self {
-            Unit::Year => CFDuration::years(1, calendar),
-            Unit::Month => CFDuration::months(1, calendar),
-            Unit::Day => CFDuration::days(1, calendar),
-            Unit::Hour => CFDuration::hours(1, calendar),
-            Unit::Minute => CFDuration::minutes(1, calendar),
-            Unit::Second => CFDuration::seconds(1, calendar),
-            Unit::Millisecond => CFDuration::milliseconds(1, calendar),
-            Unit::Microsecond => CFDuration::microseconds(1, calendar),
-            Unit::Nanosecond => CFDuration::nanoseconds(1, calendar),
+            Unit::Year => CFDuration::from_years(1, calendar),
+            Unit::Month => CFDuration::from_months(1, calendar),
+            Unit::Day => CFDuration::from_days(1, calendar),
+            Unit::Hour => CFDuration::from_hours(1, calendar),
+            Unit::Minute => CFDuration::from_minutes(1, calendar),
+            Unit::Second => CFDuration::from_seconds(1, calendar),
+            Unit::Millisecond => CFDuration::from_milliseconds(1, calendar),
+            Unit::Microsecond => CFDuration::from_microseconds(1, calendar),
+            Unit::Nanosecond => CFDuration::from_nanoseconds(1, calendar),
         }
     }
 }

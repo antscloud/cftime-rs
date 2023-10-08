@@ -4,6 +4,7 @@ pub mod datetime;
 pub mod datetimes;
 pub mod decoder;
 pub mod duration;
+pub mod encoder;
 pub mod errors;
 pub mod parser;
 pub mod timezone;

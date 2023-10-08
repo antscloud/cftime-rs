@@ -1,23 +1,7 @@
+use crate::utils::get_datetime_and_unit_from_units;
 use crate::{
     calendars::Calendar, datetime::CFDatetime, duration::CFDuration, parser::parse_cf_time,
 };
-
-fn get_datetime_and_duration(
-    units: &str,
-    calendar: Calendar,
-) -> Result<(CFDatetime, CFDuration), crate::errors::Error> {
-    let parsed_cf_time = parse_cf_time(units)?;
-    let (year, month, day) = parsed_cf_time.datetime.ymd;
-    let (hour, minute, second) = match parsed_cf_time.datetime.hms {
-        Some(hms) => (hms.0, hms.1, hms.2),
-        None => (0, 0, 0.0),
-    };
-    let cf_datetime = CFDatetime::from_ymd_hms(year, month, day, hour, minute, second, calendar)?;
-    let unit = parsed_cf_time.unit;
-    let duration = unit.to_duration(calendar);
-    Ok((cf_datetime, duration))
-}
-
 pub trait CFDecoder {
     fn decode_cf(
         &self,
@@ -34,7 +18,8 @@ macro_rules! impl_cf_decoder {
                 units: &str,
                 calendar: Calendar,
             ) -> Result<CFDatetime, crate::errors::Error> {
-                let (cf_datetime, duration) = get_datetime_and_duration(units, calendar)?;
+                let (cf_datetime, unit) = get_datetime_and_unit_from_units(units, calendar)?;
+                let duration = unit.to_duration(calendar);
                 let result = (&cf_datetime + (&duration * *self))?;
 
                 Ok(result)
@@ -64,7 +49,8 @@ macro_rules! impl_vec_cf_decoder {
                 units: &str,
                 calendar: Calendar,
             ) -> Result<Vec<CFDatetime>, crate::errors::Error> {
-                let (cf_datetime, duration) = get_datetime_and_duration(units, calendar)?;
+                let (cf_datetime, unit) = get_datetime_and_unit_from_units(units, calendar)?;
+                let duration = unit.to_duration(calendar);
 
                 let mut datetimes = Vec::with_capacity(self.len());
                 for value in self {
