@@ -336,14 +336,14 @@ pub fn normalize_nanoseconds(nanoseconds: i64) -> (i64, u32) {
 /// The encoded value of the unit of time.
 pub fn unit_to_encode(unit: &Unit, duration: CFDuration) -> f64 {
     match unit {
-        Unit::Year => duration.years(),               // Convert to years
-        Unit::Month => duration.months(),             // Convert to months
-        Unit::Day => duration.days(),                 // Convert to days
-        Unit::Hour => duration.hours(),               // Convert to hours
-        Unit::Minute => duration.minutes(),           // Convert to minutes
-        Unit::Second => duration.seconds(),           // Convert to seconds
-        Unit::Millisecond => duration.milliseconds(), // Convert to milliseconds
-        Unit::Microsecond => duration.microseconds(), // Convert to microseconds
-        Unit::Nanosecond => duration.nanoseconds(),   // Convert to nanoseconds
+        Unit::Year => duration.num_years(),     // Convert to years
+        Unit::Month => duration.num_months(),   // Convert to months
+        Unit::Day => duration.num_days(),       // Convert to days
+        Unit::Hour => duration.num_hours(),     // Convert to hours
+        Unit::Minute => duration.num_minutes(), // Convert to minutes
+        Unit::Second => duration.num_seconds(), // Convert to seconds
+        Unit::Millisecond => duration.num_milliseconds(), // Convert to milliseconds
+        Unit::Microsecond => duration.num_microseconds(), // Convert to microseconds
+        Unit::Nanosecond => duration.num_nanoseconds(), // Convert to nanoseconds
     }
 }

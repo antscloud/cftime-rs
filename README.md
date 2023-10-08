@@ -81,3 +81,15 @@ will print :
 4
 5
 ```
+
+## Known issues
+While this date calculation library can handle a wide range of dates, from approximately -291,672,107,014 BC to 291,672,107,014 AD, there are some performance considerations you should be aware of.
+As you move further away from the reference date of 1970-01-01 00:00:00, the calculation speed may decrease significantly. This is because the library needs to account for leap years in various calendars.
+
+Here is an example of the computation of the year 751 417 763 (i.e. tranforming timestamp in seconds to date) on my personal computer :
+
+| Calendar          | Computation Time     |
+|-------------------|----------------------|
+| Standard Calendar | 1.6 seconds          |
+| Leap Day Calendar | 172.298 milliseconds |
+| 360-Day Calendar  | 1.142 microseconds   |

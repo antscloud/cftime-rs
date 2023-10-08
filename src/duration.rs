@@ -62,41 +62,43 @@ impl CFDuration {
     pub fn from_nanoseconds(nanoseconds: i64, calendar: Calendar) -> CFDuration {
         Self::new(0, nanoseconds, calendar)
     }
-    pub fn years(&self) -> f64 {
+    pub fn num_years(&self) -> f64 {
         match self.calendar {
-            Calendar::Gregorian => self.days() / 365.2425,
-            Calendar::ProlepticGregorian | Calendar::Standard => self.seconds() / 3.15569259747e7,
-            Calendar::NoLeap | Calendar::Day365 => self.days() / 365.0,
-            Calendar::AllLeap | Calendar::Day366 => self.days() / 366.0,
-            Calendar::Julian => self.days() / 365.25,
-            Calendar::Day360 => self.days() / 360.0,
+            Calendar::Gregorian => self.num_days() / 365.2425,
+            Calendar::ProlepticGregorian | Calendar::Standard => {
+                self.num_seconds() / 3.15569259747e7
+            }
+            Calendar::NoLeap | Calendar::Day365 => self.num_days() / 365.0,
+            Calendar::AllLeap | Calendar::Day366 => self.num_days() / 366.0,
+            Calendar::Julian => self.num_days() / 365.25,
+            Calendar::Day360 => self.num_days() / 360.0,
         }
     }
-    pub fn months(&self) -> f64 {
-        self.years() * 12.
+    pub fn num_months(&self) -> f64 {
+        self.num_years() * 12.
     }
-    pub fn weeks(&self) -> f64 {
-        self.days() / 7.
+    pub fn num_weeks(&self) -> f64 {
+        self.num_days() / 7.
     }
-    pub fn days(&self) -> f64 {
-        self.hours() / 24.
+    pub fn num_days(&self) -> f64 {
+        self.num_hours() / 24.
     }
-    pub fn hours(&self) -> f64 {
-        self.minutes() / 60.
+    pub fn num_hours(&self) -> f64 {
+        self.num_minutes() / 60.
     }
-    pub fn minutes(&self) -> f64 {
-        self.seconds() / 60.0
+    pub fn num_minutes(&self) -> f64 {
+        self.num_seconds() / 60.0
     }
-    pub fn seconds(&self) -> f64 {
+    pub fn num_seconds(&self) -> f64 {
         self.seconds as f64 + self.nanoseconds as f64 / 1e9
     }
-    pub fn milliseconds(&self) -> f64 {
-        self.seconds() * 1e3
+    pub fn num_milliseconds(&self) -> f64 {
+        self.num_seconds() * 1e3
     }
-    pub fn microseconds(&self) -> f64 {
-        self.seconds() * 1e6
+    pub fn num_microseconds(&self) -> f64 {
+        self.num_seconds() * 1e6
     }
-    pub fn nanoseconds(&self) -> f64 {
+    pub fn num_nanoseconds(&self) -> f64 {
         (self.seconds * 1_000_000_000 + self.nanoseconds as i64) as f64
     }
 }
@@ -245,35 +247,35 @@ mod tests {
             println!("{}", cal);
             println!("Week");
             let duration = CFDuration::from_weeks(1, cal);
-            let duration_result = duration.weeks();
+            let duration_result = duration.num_weeks();
             assert_eq!(duration_result, 1.0);
             println!("Day");
             let duration = CFDuration::from_days(1, cal);
-            let duration_result = duration.days();
+            let duration_result = duration.num_days();
             assert_eq!(duration_result, 1.0);
             println!("Hours");
             let duration = CFDuration::from_hours(1, cal);
-            let duration_result = duration.hours();
+            let duration_result = duration.num_hours();
             assert_eq!(duration_result, 1.0);
             println!("Minutes");
             let duration = CFDuration::from_minutes(1, cal);
-            let duration_result = duration.minutes();
+            let duration_result = duration.num_minutes();
             assert_eq!(duration_result, 1.0);
             println!("Seconds");
             let duration = CFDuration::from_seconds(1, cal);
-            let duration_result = duration.seconds();
+            let duration_result = duration.num_seconds();
             assert_eq!(duration_result, 1.0);
             println!("Milliseconds");
             let duration = CFDuration::from_milliseconds(1, cal);
-            let duration_result = duration.milliseconds();
+            let duration_result = duration.num_milliseconds();
             assert_eq!(duration_result, 1.0);
             println!("Microseconds");
             let duration = CFDuration::from_microseconds(1, cal);
-            let duration_result = duration.microseconds();
+            let duration_result = duration.num_microseconds();
             assert_eq!(duration_result, 1.0);
             println!("Nanoseconds");
             let duration = CFDuration::from_nanoseconds(1, cal);
-            let duration_result = duration.nanoseconds();
+            let duration_result = duration.num_nanoseconds();
             assert_eq!(duration_result, 1.0);
         }
         // Years and month are not exact so we need to test by omparing with an epsilon
@@ -281,11 +283,11 @@ mod tests {
         for cal in cals {
             println!("Year");
             let duration = CFDuration::from_years(1, cal);
-            let duration_result = duration.years();
+            let duration_result = duration.num_years();
             assert!((duration_result - 1.0).abs() < epsilon);
             println!("Month");
             let duration = CFDuration::from_months(1, cal);
-            let duration_result = duration.months();
+            let duration_result = duration.num_months();
             assert!((duration_result - 1.0).abs() < epsilon);
         }
     }
