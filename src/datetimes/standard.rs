@@ -59,7 +59,7 @@ impl CalendarDatetime for StandardDatetime {
 }
 
 impl CalendarDatetimeCreator for StandardDatetime {
-    fn from_timestamp(timestamp: i64, nanoseconds: u32) -> Self {
+    fn from_timestamp(timestamp: i64, _nanoseconds: u32) -> Self {
         Self {
             timestamp,
             nanoseconds: 0,
@@ -76,14 +76,12 @@ impl CalendarDatetimeCreator for StandardDatetime {
         second: f32,
     ) -> Result<Self, crate::errors::Error> {
         let (mut timestamp, nanoseconds) = get_timestamp_from_hms(hour, minute, second)?;
-        if year == 1582 && month == 10 {
-            if (day == 4 && (hour > 0 || minute > 0 || second > 0.0)) || (day >= 5 && day < 15) {
-                println!("{} {} {} {} {} {}", year, month, day, hour, minute, second);
-                return Err(crate::errors::Error::InvalidDate(
-                    "Date between 1582-10-04 and 1582-10-15 are not defined in the standard calendar"
-                        .to_string(),
-                ));
-            }
+        if year == 1582 && month == 10 && ((day == 4 && (hour > 0 || minute > 0 || second > 0.0)) || (5..15).contains(&day)) {
+            println!("{} {} {} {} {} {}", year, month, day, hour, minute, second);
+            return Err(crate::errors::Error::InvalidDate(
+                "Date between 1582-10-04 and 1582-10-15 are not defined in the standard calendar"
+                    .to_string(),
+            ));
         }
         if year < 1582 || (year == 1582 && month < 10) || (year == 1582 && month == 10 && day < 15)
         {
@@ -94,7 +92,7 @@ impl CalendarDatetimeCreator for StandardDatetime {
         timestamp += get_timestamp_from_ymd::<StandardDatetime>(year, month, day)?;
         Ok(Self {
             timestamp,
-            nanoseconds: nanoseconds,
+            nanoseconds,
             tz: Tz::new(0, 0).unwrap(),
             calendar: Calendar::Standard,
         })

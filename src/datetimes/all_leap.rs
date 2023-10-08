@@ -23,7 +23,7 @@ impl AllLeapDatetime {
     }
 }
 impl IsLeap for AllLeapDatetime {
-    fn is_leap(year: i64) -> bool {
+    fn is_leap(_year: i64) -> bool {
         true
     }
 }
@@ -51,7 +51,7 @@ impl CalendarDatetimeCreator for AllLeapDatetime {
     fn from_timestamp(timestamp: i64, nanoseconds: u32) -> Self {
         Self {
             timestamp,
-            nanoseconds: nanoseconds,
+            nanoseconds,
             tz: Tz::new(0, 0).unwrap(),
             calendar: Calendar::AllLeap,
         }
@@ -68,7 +68,7 @@ impl CalendarDatetimeCreator for AllLeapDatetime {
         timestamp += get_timestamp_from_ymd::<AllLeapDatetime>(year, month, day)?;
         Ok(Self {
             timestamp,
-            nanoseconds: nanoseconds,
+            nanoseconds,
             tz: Tz::new(0, 0).unwrap(),
             calendar: Calendar::AllLeap,
         })

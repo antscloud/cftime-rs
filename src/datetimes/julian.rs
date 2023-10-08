@@ -2,7 +2,7 @@ use crate::calendars::Calendar;
 use crate::datetimes::traits::{CalendarDatetime, IsLeap};
 use crate::timezone::Tz;
 use crate::utils::{
-    get_timestamp_from_hms, get_timestamp_from_ymd, get_ymd_hms_from_timestamp, is_leap_gregorian,
+    get_timestamp_from_hms, get_timestamp_from_ymd, get_ymd_hms_from_timestamp,
     is_leap_julian,
 };
 
@@ -53,7 +53,7 @@ impl CalendarDatetimeCreator for JulianDatetime {
     fn from_timestamp(timestamp: i64, nanoseconds: u32) -> Self {
         Self {
             timestamp,
-            nanoseconds: nanoseconds,
+            nanoseconds,
             tz: Tz::new(0, 0).unwrap(),
             calendar: Calendar::Julian,
         }
@@ -70,7 +70,7 @@ impl CalendarDatetimeCreator for JulianDatetime {
         timestamp += get_timestamp_from_ymd::<JulianDatetime>(year, month, day)?;
         Ok(Self {
             timestamp,
-            nanoseconds: nanoseconds,
+            nanoseconds,
             tz: Tz::new(0, 0).unwrap(),
             calendar: Calendar::Julian,
         })

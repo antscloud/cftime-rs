@@ -23,7 +23,7 @@ impl NoLeapDatetime {
     }
 }
 impl IsLeap for NoLeapDatetime {
-    fn is_leap(year: i64) -> bool {
+    fn is_leap(_year: i64) -> bool {
         false
     }
 }
@@ -49,7 +49,7 @@ impl CalendarDatetimeCreator for NoLeapDatetime {
     fn from_timestamp(timestamp: i64, nanoseconds: u32) -> Self {
         Self {
             timestamp,
-            nanoseconds: nanoseconds,
+            nanoseconds,
             tz: Tz::new(0, 0).unwrap(),
             calendar: Calendar::NoLeap,
         }
@@ -66,7 +66,7 @@ impl CalendarDatetimeCreator for NoLeapDatetime {
         timestamp += get_timestamp_from_ymd::<NoLeapDatetime>(year, month, day)?;
         Ok(Self {
             timestamp,
-            nanoseconds: nanoseconds,
+            nanoseconds,
             tz: Tz::new(0, 0).unwrap(),
             calendar: Calendar::NoLeap,
         })

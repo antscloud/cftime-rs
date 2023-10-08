@@ -1,6 +1,6 @@
 use crate::utils::get_datetime_and_unit_from_units;
 use crate::{
-    calendars::Calendar, datetime::CFDatetime, duration::CFDuration, parser::parse_cf_time,
+    calendars::Calendar, datetime::CFDatetime,
 };
 pub trait CFDecoder {
     fn decode_cf(

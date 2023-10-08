@@ -20,8 +20,8 @@ pub const CUM_DAYS_PER_MONTH_360: [u32; 13] = cumsum_cal(&DAYS_PER_MONTH_360);
 
 // UNIX TIMESTAMP
 pub const UNIX_DEFAULT_YEAR: i64 = 1970;
-pub const UNIX_DEFAULT_MONTH: u8 = 01;
-pub const UNIX_DEFAULT_DAY: u8 = 01;
+pub const UNIX_DEFAULT_MONTH: u8 = 1;
+pub const UNIX_DEFAULT_DAY: u8 = 1;
 
 // GENERALITIES
 pub const SECS_PER_HOUR: u32 = 3600;

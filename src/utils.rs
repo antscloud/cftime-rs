@@ -2,7 +2,7 @@ use crate::{
     calendars::Calendar,
     constants,
     datetime::CFDatetime,
-    datetimes::traits::{CalendarDatetime, IsLeap},
+    datetimes::traits::IsLeap,
     duration::CFDuration,
     parser::{parse_cf_time, Unit},
 };
@@ -253,7 +253,7 @@ pub fn get_timestamp_from_hms(
             format!("Minute {min} is out of bounds").to_string(),
         ));
     }
-    if sec >= 60.0 || sec < 0.0 {
+    if !(0.0..60.0).contains(&sec) {
         return Err(crate::errors::Error::InvalidTime(
             format!("Second {sec} is out of bounds").to_string(),
         ));
@@ -311,16 +311,14 @@ pub fn normalize_nanoseconds(nanoseconds: i64) -> (i64, u32) {
     let mut remaining_seconds = nanoseconds / 1e9 as i64;
 
     // Calculate the number of remaining nanoseconds
-    let mut remaining_nanoseconds = 0;
-    if remaining_seconds < 0 {
+    let remaining_nanoseconds: i64 = if remaining_seconds < 0 {
         // If the remaining seconds is negative, subtract 1 and calculate the remaining nanoseconds accordingly
         remaining_seconds -= 1;
-        remaining_nanoseconds =
-            (nanoseconds + (remaining_seconds.abs() * 1_000_000_000)) % 1_000_000_000;
+        (nanoseconds + (remaining_seconds.abs() * 1_000_000_000)) % 1_000_000_000
     } else {
         // If the remaining seconds is positive or zero, calculate the remaining nanoseconds directly
-        remaining_nanoseconds = nanoseconds % 1e9 as i64;
-    }
+        nanoseconds % 1e9 as i64
+    };
     (remaining_seconds, remaining_nanoseconds as u32)
 }
 /// Converts a unit of time to its corresponding encoded value.

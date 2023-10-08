@@ -1,4 +1,4 @@
-use cftime_rs::{calendars::Calendar, constants};
+use cftime_rs::{calendars::Calendar};
 
 pub trait CFTimeEncoder {
     fn cf_time_encode(unit: &str, calendar: Calendar);

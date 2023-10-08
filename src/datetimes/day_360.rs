@@ -46,7 +46,7 @@ impl CalendarDatetime for Day360Datetime {
         let (nb_year, nb_month_days) = (nb_days / 360, nb_days % 360);
 
         let (month, day) = (nb_month_days / 30, nb_month_days % 30);
-        let year = constants::UNIX_DEFAULT_YEAR as i64 + nb_year;
+        let year = constants::UNIX_DEFAULT_YEAR + nb_year;
         let (hour, minute, second) = get_hms_from_timestamp(remaining_seconds);
         Ok((
             year,
@@ -63,7 +63,7 @@ impl CalendarDatetimeCreator for Day360Datetime {
     fn from_timestamp(timestamp: i64, nanoseconds: u32) -> Self {
         Self {
             timestamp,
-            nanoseconds: nanoseconds,
+            nanoseconds,
             tz: Tz::new(0, 0).unwrap(),
             calendar: Calendar::Day360,
         }
@@ -104,7 +104,7 @@ impl CalendarDatetimeCreator for Day360Datetime {
             calendar: Calendar::Day360,
             timestamp,
             tz: Tz::new(0, 0).unwrap(),
-            nanoseconds: nanoseconds,
+            nanoseconds,
         })
     }
 }

@@ -7,7 +7,7 @@ use crate::datetimes::standard::StandardDatetime;
 use crate::datetimes::traits::CalendarDatetime;
 use crate::datetimes::traits::CalendarDatetimeCreator;
 use crate::duration::CFDuration;
-use crate::utils::get_timestamp_from_ymd;
+
 use crate::utils::normalize_nanoseconds;
 use crate::{calendars::Calendar, constants};
 /// calendar represents the calendar to use
@@ -159,7 +159,7 @@ impl std::ops::Add<CFDuration> for CFDatetime {
     type Output = Result<CFDatetime, crate::errors::Error>;
     fn add(self, rhs: CFDuration) -> Self::Output {
         let nanoseconds = self.nanoseconds() as i64 + rhs.nanoseconds() as i64;
-        let (remaining_seconds, remaining_nanoseconds) = normalize_nanoseconds(nanoseconds);
+        let (_remaining_seconds, remaining_nanoseconds) = normalize_nanoseconds(nanoseconds);
         let new_timestamp = self.timestamp() + rhs.seconds;
         CFDatetime::from_timestamp(new_timestamp, remaining_nanoseconds, self.calendar())
     }
@@ -169,7 +169,7 @@ impl std::ops::Add<&CFDuration> for CFDatetime {
     type Output = Result<CFDatetime, crate::errors::Error>;
     fn add(self, rhs: &CFDuration) -> Self::Output {
         let nanoseconds = self.nanoseconds() as i64 + rhs.nanoseconds() as i64;
-        let (remaining_seconds, remaining_nanoseconds) = normalize_nanoseconds(nanoseconds);
+        let (_remaining_seconds, remaining_nanoseconds) = normalize_nanoseconds(nanoseconds);
         let new_timestamp = self.timestamp() + rhs.seconds;
         CFDatetime::from_timestamp(new_timestamp, remaining_nanoseconds, self.calendar())
     }
@@ -179,7 +179,7 @@ impl std::ops::Add<CFDuration> for &CFDatetime {
     type Output = Result<CFDatetime, crate::errors::Error>;
     fn add(self, rhs: CFDuration) -> Self::Output {
         let nanoseconds = self.nanoseconds() as i64 + rhs.nanoseconds() as i64;
-        let (remaining_seconds, remaining_nanoseconds) = normalize_nanoseconds(nanoseconds);
+        let (_remaining_seconds, remaining_nanoseconds) = normalize_nanoseconds(nanoseconds);
         let new_timestamp = self.timestamp() + rhs.seconds;
         CFDatetime::from_timestamp(new_timestamp, remaining_nanoseconds, self.calendar())
     }
@@ -189,7 +189,7 @@ impl std::ops::Add<&CFDuration> for &CFDatetime {
     type Output = Result<CFDatetime, crate::errors::Error>;
     fn add(self, rhs: &CFDuration) -> Self::Output {
         let nanoseconds = self.nanoseconds() as i64 + rhs.nanoseconds() as i64;
-        let (remaining_seconds, remaining_nanoseconds) = normalize_nanoseconds(nanoseconds);
+        let (_remaining_seconds, remaining_nanoseconds) = normalize_nanoseconds(nanoseconds);
         let new_timestamp = self.timestamp() + rhs.seconds;
         CFDatetime::from_timestamp(new_timestamp, remaining_nanoseconds, self.calendar())
     }
@@ -237,7 +237,7 @@ impl std::ops::Sub<CFDatetime> for CFDatetime {
     type Output = CFDuration;
     fn sub(self, rhs: CFDatetime) -> Self::Output {
         let nanoseconds = self.nanoseconds() as i64 - rhs.nanoseconds() as i64;
-        let new_timestamp = (self.timestamp() - rhs.timestamp());
+        let new_timestamp = self.timestamp() - rhs.timestamp();
         CFDuration::new(new_timestamp, nanoseconds, self.calendar())
     }
 }
@@ -245,7 +245,7 @@ impl std::ops::Sub<&CFDatetime> for &CFDatetime {
     type Output = CFDuration;
     fn sub(self, rhs: &CFDatetime) -> Self::Output {
         let nanoseconds = self.nanoseconds() as i64 - rhs.nanoseconds() as i64;
-        let new_timestamp = (self.timestamp() - rhs.timestamp());
+        let new_timestamp = self.timestamp() - rhs.timestamp();
         CFDuration::new(new_timestamp, nanoseconds, self.calendar())
     }
 }
@@ -253,7 +253,7 @@ impl std::ops::Sub<CFDatetime> for &CFDatetime {
     type Output = CFDuration;
     fn sub(self, rhs: CFDatetime) -> Self::Output {
         let nanoseconds = self.nanoseconds() as i64 - rhs.nanoseconds() as i64;
-        let new_timestamp = (self.timestamp() - rhs.timestamp());
+        let new_timestamp = self.timestamp() - rhs.timestamp();
         CFDuration::new(new_timestamp, nanoseconds, self.calendar())
     }
 }
@@ -261,7 +261,7 @@ impl std::ops::Sub<&CFDatetime> for CFDatetime {
     type Output = CFDuration;
     fn sub(self, rhs: &CFDatetime) -> Self::Output {
         let nanoseconds = self.nanoseconds() as i64 - rhs.nanoseconds() as i64;
-        let new_timestamp = (self.timestamp() - rhs.timestamp());
+        let new_timestamp = self.timestamp() - rhs.timestamp();
         CFDuration::new(new_timestamp, nanoseconds, self.calendar())
     }
 }

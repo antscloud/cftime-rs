@@ -52,7 +52,7 @@ impl CalendarDatetimeCreator for ProlepticGregorianDatetime {
     fn from_timestamp(timestamp: i64, nanoseconds: u32) -> Self {
         Self {
             timestamp,
-            nanoseconds: nanoseconds,
+            nanoseconds,
             tz: Tz::new(0, 0).unwrap(),
             calendar: Calendar::ProlepticGregorian,
         }
@@ -69,7 +69,7 @@ impl CalendarDatetimeCreator for ProlepticGregorianDatetime {
         timestamp += get_timestamp_from_ymd::<ProlepticGregorianDatetime>(year, month, day)?;
         Ok(Self {
             timestamp,
-            nanoseconds: nanoseconds,
+            nanoseconds,
             tz: Tz::new(0, 0).unwrap(),
             calendar: Calendar::ProlepticGregorian,
         })

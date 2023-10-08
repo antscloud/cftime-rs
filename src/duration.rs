@@ -12,7 +12,7 @@ impl CFDuration {
         let (remaining_seconds, remaining_nanoseconds) = normalize_nanoseconds(nanoseconds);
         Self {
             seconds: seconds + remaining_seconds,
-            nanoseconds: (remaining_nanoseconds) as u32,
+            nanoseconds: (remaining_nanoseconds),
             calendar,
         }
     }
@@ -134,7 +134,7 @@ impl std::ops::Mul<i64> for CFDuration {
     fn mul(self, rhs: i64) -> Self::Output {
         Self::new(
             self.seconds * rhs,
-            self.nanoseconds as i64 * rhs as i64,
+            self.nanoseconds as i64 * rhs,
             self.calendar,
         )
     }
