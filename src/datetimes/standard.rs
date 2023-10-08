@@ -59,7 +59,7 @@ impl CalendarDatetime for StandardDatetime {
 }
 
 impl CalendarDatetimeCreator for StandardDatetime {
-    fn from_timestamp(timestamp: i64) -> Self {
+    fn from_timestamp(timestamp: i64, nanoseconds: u32) -> Self {
         Self {
             timestamp,
             nanoseconds: 0,

@@ -42,7 +42,6 @@ impl CalendarDatetime for ProlepticGregorianDatetime {
     fn timezone(&self) -> Tz {
         self.tz
     }
-
     fn ymd_hms(&self) -> Result<(i64, u8, u8, u8, u8, u8), crate::errors::Error> {
         Ok(get_ymd_hms_from_timestamp::<ProlepticGregorianDatetime>(
             self.timestamp,
@@ -50,10 +49,10 @@ impl CalendarDatetime for ProlepticGregorianDatetime {
     }
 }
 impl CalendarDatetimeCreator for ProlepticGregorianDatetime {
-    fn from_timestamp(timestamp: i64) -> Self {
+    fn from_timestamp(timestamp: i64, nanoseconds: u32) -> Self {
         Self {
             timestamp,
-            nanoseconds: 0,
+            nanoseconds: nanoseconds,
             tz: Tz::new(0, 0).unwrap(),
             calendar: Calendar::ProlepticGregorian,
         }

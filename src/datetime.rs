@@ -8,6 +8,7 @@ use crate::datetimes::traits::CalendarDatetime;
 use crate::datetimes::traits::CalendarDatetimeCreator;
 use crate::duration::CFDuration;
 use crate::utils::get_timestamp_from_ymd;
+use crate::utils::normalize_nanoseconds;
 use crate::{calendars::Calendar, constants};
 /// calendar represents the calendar to use
 /// timestamp represents the number of seconds since 1970-01-01 00:00:00 UTC
@@ -110,26 +111,30 @@ impl CFDatetime {
     }
     pub fn from_timestamp(
         timestamp: i64,
+        nanoseconds: u32,
         calendar: Calendar,
     ) -> Result<Self, crate::errors::Error> {
         match calendar {
             Calendar::ProlepticGregorian => Ok(Self {
-                inner: Box::new(ProlepticGregorianDatetime::from_timestamp(timestamp)),
+                inner: Box::new(ProlepticGregorianDatetime::from_timestamp(
+                    timestamp,
+                    nanoseconds,
+                )),
             }),
             Calendar::Standard | Calendar::Gregorian => Ok(Self {
-                inner: Box::new(StandardDatetime::from_timestamp(timestamp)),
+                inner: Box::new(StandardDatetime::from_timestamp(timestamp, nanoseconds)),
             }),
             Calendar::Day360 => Ok(Self {
-                inner: Box::new(Day360Datetime::from_timestamp(timestamp)),
+                inner: Box::new(Day360Datetime::from_timestamp(timestamp, nanoseconds)),
             }),
             Calendar::Julian => Ok(Self {
-                inner: Box::new(JulianDatetime::from_timestamp(timestamp)),
+                inner: Box::new(JulianDatetime::from_timestamp(timestamp, nanoseconds)),
             }),
             Calendar::NoLeap | Calendar::Day365 => Ok(Self {
-                inner: Box::new(NoLeapDatetime::from_timestamp(timestamp)),
+                inner: Box::new(NoLeapDatetime::from_timestamp(timestamp, nanoseconds)),
             }),
             Calendar::AllLeap | Calendar::Day366 => Ok(Self {
-                inner: Box::new(AllLeapDatetime::from_timestamp(timestamp)),
+                inner: Box::new(AllLeapDatetime::from_timestamp(timestamp, nanoseconds)),
             }),
         }
     }
@@ -150,83 +155,114 @@ impl CFDatetime {
     }
 }
 
-pub trait CFTimeDecoder {
-    fn decode_cf_time(
-        &self,
-        timestamp: i64,
-        calendar: Calendar,
-    ) -> Result<CFDatetime, crate::errors::Error>;
-}
-
-impl CFTimeDecoder for i64 {
-    fn decode_cf_time(
-        &self,
-        timestamp: i64,
-        calendar: Calendar,
-    ) -> Result<CFDatetime, crate::errors::Error> {
-        CFDatetime::from_timestamp(timestamp, calendar)
-    }
-}
-
 impl std::ops::Add<CFDuration> for CFDatetime {
     type Output = Result<CFDatetime, crate::errors::Error>;
     fn add(self, rhs: CFDuration) -> Self::Output {
+        let nanoseconds = self.nanoseconds() as i64 + rhs.nanoseconds() as i64;
+        let (remaining_seconds, remaining_nanoseconds) = normalize_nanoseconds(nanoseconds);
         let new_timestamp = self.timestamp() + rhs.seconds;
-        CFDatetime::from_timestamp(new_timestamp, self.calendar())
+        CFDatetime::from_timestamp(new_timestamp, remaining_nanoseconds, self.calendar())
     }
 }
 
 impl std::ops::Add<&CFDuration> for CFDatetime {
     type Output = Result<CFDatetime, crate::errors::Error>;
     fn add(self, rhs: &CFDuration) -> Self::Output {
+        let nanoseconds = self.nanoseconds() as i64 + rhs.nanoseconds() as i64;
+        let (remaining_seconds, remaining_nanoseconds) = normalize_nanoseconds(nanoseconds);
         let new_timestamp = self.timestamp() + rhs.seconds;
-        CFDatetime::from_timestamp(new_timestamp, self.calendar())
+        CFDatetime::from_timestamp(new_timestamp, remaining_nanoseconds, self.calendar())
     }
 }
 
 impl std::ops::Add<CFDuration> for &CFDatetime {
     type Output = Result<CFDatetime, crate::errors::Error>;
     fn add(self, rhs: CFDuration) -> Self::Output {
+        let nanoseconds = self.nanoseconds() as i64 + rhs.nanoseconds() as i64;
+        let (remaining_seconds, remaining_nanoseconds) = normalize_nanoseconds(nanoseconds);
         let new_timestamp = self.timestamp() + rhs.seconds;
-        CFDatetime::from_timestamp(new_timestamp, self.calendar())
+        CFDatetime::from_timestamp(new_timestamp, remaining_nanoseconds, self.calendar())
     }
 }
 
 impl std::ops::Add<&CFDuration> for &CFDatetime {
     type Output = Result<CFDatetime, crate::errors::Error>;
     fn add(self, rhs: &CFDuration) -> Self::Output {
+        let nanoseconds = self.nanoseconds() as i64 + rhs.nanoseconds() as i64;
+        let (remaining_seconds, remaining_nanoseconds) = normalize_nanoseconds(nanoseconds);
         let new_timestamp = self.timestamp() + rhs.seconds;
-        CFDatetime::from_timestamp(new_timestamp, self.calendar())
+        CFDatetime::from_timestamp(new_timestamp, remaining_nanoseconds, self.calendar())
     }
 }
 
 impl std::ops::Sub<CFDuration> for CFDatetime {
     type Output = Result<CFDatetime, crate::errors::Error>;
     fn sub(self, rhs: CFDuration) -> Self::Output {
-        let new_timestamp = self.timestamp() - rhs.seconds;
-        CFDatetime::from_timestamp(new_timestamp, self.calendar())
+        let nanoseconds = self.nanoseconds() as i64 - rhs.nanoseconds() as i64;
+        let (remaining_seconds, remaining_nanoseconds) = normalize_nanoseconds(nanoseconds);
+        let new_timestamp = (self.timestamp() - rhs.seconds) + remaining_seconds;
+        CFDatetime::from_timestamp(new_timestamp, remaining_nanoseconds, self.calendar())
     }
 }
 impl std::ops::Sub<CFDuration> for &CFDatetime {
     type Output = Result<CFDatetime, crate::errors::Error>;
     fn sub(self, rhs: CFDuration) -> Self::Output {
-        let new_timestamp = self.timestamp() - rhs.seconds;
-        CFDatetime::from_timestamp(new_timestamp, self.calendar())
+        let nanoseconds = self.nanoseconds() as i64 - rhs.nanoseconds() as i64;
+        let (remaining_seconds, remaining_nanoseconds) = normalize_nanoseconds(nanoseconds);
+        let new_timestamp = (self.timestamp() - rhs.seconds) + remaining_seconds;
+        CFDatetime::from_timestamp(new_timestamp, remaining_nanoseconds, self.calendar())
     }
 }
 impl std::ops::Sub<&CFDuration> for CFDatetime {
     type Output = Result<CFDatetime, crate::errors::Error>;
     fn sub(self, rhs: &CFDuration) -> Self::Output {
-        let new_timestamp = self.timestamp() - rhs.seconds;
-        CFDatetime::from_timestamp(new_timestamp, self.calendar())
+        let nanoseconds = self.nanoseconds() as i64 - rhs.nanoseconds() as i64;
+        let (remaining_seconds, remaining_nanoseconds) = normalize_nanoseconds(nanoseconds);
+        let new_timestamp = (self.timestamp() - rhs.seconds) + remaining_seconds;
+        CFDatetime::from_timestamp(new_timestamp, remaining_nanoseconds, self.calendar())
     }
 }
 
 impl std::ops::Sub<&CFDuration> for &CFDatetime {
     type Output = Result<CFDatetime, crate::errors::Error>;
     fn sub(self, rhs: &CFDuration) -> Self::Output {
-        let new_timestamp = self.timestamp() - rhs.seconds;
-        CFDatetime::from_timestamp(new_timestamp, self.calendar())
+        let nanoseconds = self.nanoseconds() as i64 - rhs.nanoseconds() as i64;
+        let (remaining_seconds, remaining_nanoseconds) = normalize_nanoseconds(nanoseconds);
+        let new_timestamp = (self.timestamp() - rhs.seconds) + remaining_seconds;
+        CFDatetime::from_timestamp(new_timestamp, remaining_nanoseconds, self.calendar())
+    }
+}
+
+impl std::ops::Sub<CFDatetime> for CFDatetime {
+    type Output = CFDuration;
+    fn sub(self, rhs: CFDatetime) -> Self::Output {
+        let nanoseconds = self.nanoseconds() as i64 - rhs.nanoseconds() as i64;
+        let new_timestamp = (self.timestamp() - rhs.timestamp());
+        CFDuration::new(new_timestamp, nanoseconds, self.calendar())
+    }
+}
+impl std::ops::Sub<&CFDatetime> for &CFDatetime {
+    type Output = CFDuration;
+    fn sub(self, rhs: &CFDatetime) -> Self::Output {
+        let nanoseconds = self.nanoseconds() as i64 - rhs.nanoseconds() as i64;
+        let new_timestamp = (self.timestamp() - rhs.timestamp());
+        CFDuration::new(new_timestamp, nanoseconds, self.calendar())
+    }
+}
+impl std::ops::Sub<CFDatetime> for &CFDatetime {
+    type Output = CFDuration;
+    fn sub(self, rhs: CFDatetime) -> Self::Output {
+        let nanoseconds = self.nanoseconds() as i64 - rhs.nanoseconds() as i64;
+        let new_timestamp = (self.timestamp() - rhs.timestamp());
+        CFDuration::new(new_timestamp, nanoseconds, self.calendar())
+    }
+}
+impl std::ops::Sub<&CFDatetime> for CFDatetime {
+    type Output = CFDuration;
+    fn sub(self, rhs: &CFDatetime) -> Self::Output {
+        let nanoseconds = self.nanoseconds() as i64 - rhs.nanoseconds() as i64;
+        let new_timestamp = (self.timestamp() - rhs.timestamp());
+        CFDuration::new(new_timestamp, nanoseconds, self.calendar())
     }
 }
 
@@ -263,7 +299,7 @@ mod tests {
             calendars::Calendar::Day366,
         ];
         for cal in cals {
-            let d = CFDatetime::from_timestamp(-1, cal);
+            let d = CFDatetime::from_timestamp(-1, 0, cal);
             println!("{}", cal);
             assert_eq!((1969, 12, 31, 23, 59, 59), d.unwrap().ymd_hms().unwrap());
         }
@@ -277,8 +313,8 @@ mod tests {
                 .unwrap()
                 .timestamp()
         );
-        let lower_limit_gregorian = CFDatetime::from_timestamp(-12219292800, Calendar::Standard);
-        let upper_limit_julian = CFDatetime::from_timestamp(-12219292801, Calendar::Standard);
+        let lower_limit_gregorian = CFDatetime::from_timestamp(-12219292800, 0, Calendar::Standard);
+        let upper_limit_julian = CFDatetime::from_timestamp(-12219292801, 0, Calendar::Standard);
         assert_eq!(
             lower_limit_gregorian.unwrap().ymd_hms().unwrap(),
             (1582, 10, 15, 0, 0, 0)
@@ -337,10 +373,10 @@ mod tests {
         ];
         for calendar in cals {
             let duration_expected = vec![
-                (CFDuration::hours(1, calendar), (1970, 1, 1, 1, 0, 0)),
-                (CFDuration::minutes(1, calendar), (1970, 1, 1, 0, 1, 0)),
-                (CFDuration::seconds(1, calendar), (1970, 1, 1, 0, 0, 1)),
-                (CFDuration::days(1, calendar), (1970, 1, 2, 0, 0, 0)),
+                (CFDuration::from_hours(1, calendar), (1970, 1, 1, 1, 0, 0)),
+                (CFDuration::from_minutes(1, calendar), (1970, 1, 1, 0, 1, 0)),
+                (CFDuration::from_seconds(1, calendar), (1970, 1, 1, 0, 0, 1)),
+                (CFDuration::from_days(1, calendar), (1970, 1, 2, 0, 0, 0)),
             ];
             for (duration, expected) in duration_expected {
                 let datetime = CFDatetime::from_ymd(1970, 1, 1, calendar).unwrap();
@@ -363,7 +399,7 @@ mod tests {
             (946857600, (2000, 1, 3, 0, 0, 0)),
         ];
         for (timestamp, expected) in timestamp_expected {
-            let datetime = CFDatetime::from_timestamp(timestamp, calendars::Calendar::Standard);
+            let datetime = CFDatetime::from_timestamp(timestamp, 0, calendars::Calendar::Standard);
             assert_eq!(datetime.unwrap().ymd_hms().unwrap(), expected);
         }
     }

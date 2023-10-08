@@ -46,10 +46,10 @@ impl CalendarDatetime for NoLeapDatetime {
     }
 }
 impl CalendarDatetimeCreator for NoLeapDatetime {
-    fn from_timestamp(timestamp: i64) -> Self {
+    fn from_timestamp(timestamp: i64, nanoseconds: u32) -> Self {
         Self {
             timestamp,
-            nanoseconds: 0,
+            nanoseconds: nanoseconds,
             tz: Tz::new(0, 0).unwrap(),
             calendar: Calendar::NoLeap,
         }

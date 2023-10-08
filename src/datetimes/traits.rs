@@ -23,5 +23,5 @@ where
         minute: u8,
         second: f32,
     ) -> Result<Self, crate::errors::Error>;
-    fn from_timestamp(timestamp: i64) -> Self;
+    fn from_timestamp(timestamp: i64, nanoseconds: u32) -> Self;
 }
