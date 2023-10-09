@@ -39,25 +39,18 @@ pub fn get_timestamp_from_ymd<T: IsLeap>(
         }
         // We have to look at the preceding year. For example if year == 1972
         // we have to look from 1971 to 1972
-        let year_to_look_at = if current_year > constants::UNIX_DEFAULT_YEAR {
-            current_year - 1
+        let year_to_look_at = current_year - (current_year > constants::UNIX_DEFAULT_YEAR) as i64;
+        let seconds_in_year: i64 = if T::is_leap(year_to_look_at) {
+            constants::SECONDS_PER_YEAR_LEAP
         } else {
-            current_year
-        };
-        let days_in_year: i64 = if T::is_leap(year_to_look_at) {
-            constants::DAYS_PER_MONTH_LEAP
-                .iter()
-                .map(|&x| x as i64)
-                .sum()
-        } else {
-            constants::DAYS_PER_MONTH.iter().map(|&x| x as i64).sum()
+            constants::SECONDS_PER_YEAR_NON_LEAP
         };
 
         if current_year > constants::UNIX_DEFAULT_YEAR {
-            timestamp += days_in_year * constants::SECS_PER_DAY as i64;
+            timestamp += seconds_in_year;
             current_year -= 1;
         } else {
-            timestamp -= days_in_year * constants::SECS_PER_DAY as i64;
+            timestamp -= seconds_in_year;
             current_year += 1;
         }
     }
@@ -117,27 +110,22 @@ pub fn get_hms_from_timestamp(timestamp: i64) -> (u8, u8, u8) {
 /// A tuple containing the year, month, day, hour, minute, and second components of the timestamp.
 pub fn get_ymd_hms_from_timestamp<T: IsLeap>(timestamp: i64) -> (i64, u8, u8, u8, u8, u8) {
     let mut remaining_timestamp = timestamp;
-    let mut year = constants::UNIX_DEFAULT_YEAR;
+    let mut current_year = constants::UNIX_DEFAULT_YEAR;
 
     // Determine the direction (past or future)
     let direction = if timestamp >= 0 { 1 } else { -1 };
 
     loop {
-        let year_to_look_at = if year > constants::UNIX_DEFAULT_YEAR {
-            year
+        let year_to_look_at = if current_year > constants::UNIX_DEFAULT_YEAR {
+            current_year
         } else {
-            year - 1
+            current_year - 1
         };
-        let days_in_year: i64 = if T::is_leap(year_to_look_at) {
-            constants::DAYS_PER_MONTH_LEAP
-                .iter()
-                .map(|&x| x as i64)
-                .sum()
+        let seconds_in_year: i64 = if T::is_leap(year_to_look_at) {
+            constants::SECONDS_PER_YEAR_LEAP
         } else {
-            constants::DAYS_PER_MONTH.iter().map(|&x| x as i64).sum()
+            constants::SECONDS_PER_YEAR_NON_LEAP
         };
-
-        let seconds_in_year = days_in_year * constants::SECS_PER_DAY as i64;
 
         let new_remaining = remaining_timestamp - direction * seconds_in_year;
 
@@ -149,18 +137,18 @@ pub fn get_ymd_hms_from_timestamp<T: IsLeap>(timestamp: i64) -> (i64, u8, u8, u8
         // This ensure remaining_timestamp is positive or equals 0
         else if direction == -1 && (new_remaining >= 0) {
             remaining_timestamp = new_remaining;
-            year += direction;
+            current_year += direction;
             break;
         }
         remaining_timestamp = new_remaining;
-        year += direction;
+        current_year += direction;
     }
 
     // Calculate months
     // remaining_timestamp is positive or equals 0
     let mut month: i64 = 0;
     loop {
-        let days_in_month: i64 = if T::is_leap(year) {
+        let days_in_month: i64 = if T::is_leap(current_year) {
             constants::DAYS_PER_MONTH_LEAP[month as usize] as i64
         } else {
             constants::DAYS_PER_MONTH[month as usize] as i64
@@ -178,7 +166,7 @@ pub fn get_ymd_hms_from_timestamp<T: IsLeap>(timestamp: i64) -> (i64, u8, u8, u8
     let day = (remaining_timestamp / (constants::SECS_PER_DAY as i64)) as u8;
 
     let (hour, min, sec) = get_hms_from_timestamp(remaining_timestamp);
-    (year, month as u8 + 1, day + 1, hour, min, sec)
+    (current_year, month as u8 + 1, day + 1, hour, min, sec)
 }
 
 /// Determines if a given year is a leap year according to the Gregorian calendar.
@@ -191,10 +179,9 @@ pub fn get_ymd_hms_from_timestamp<T: IsLeap>(timestamp: i64) -> (i64, u8, u8, u8
 ///
 /// Returns `true` if the year is a leap year, `false` otherwise.
 pub fn is_leap_gregorian(year: i64) -> bool {
-    let mut f_year = year;
-    if year < 0 {
-        f_year = year + 1;
-    }
+    // Optimization : Adds 1 for negative years, 0 for non-negative years
+    // We extract the sign bit from the year i64 variable
+    let f_year = ((year >> 63) & 1) + year;
     (f_year % 400 == 0) || ((f_year % 4 == 0) && (f_year % 100 != 0))
 }
 
@@ -208,11 +195,9 @@ pub fn is_leap_gregorian(year: i64) -> bool {
 ///
 /// * `true` if the year is a leap year, `false` otherwise.
 pub fn is_leap_julian(year: i64) -> bool {
-    let mut f_year = year;
-    if year < 0 {
-        f_year = year + 1;
-    }
-    f_year % 4 == 0
+    // Optimization : Adds 1 for negative years, 0 for non-negative years
+    // We extract the sign bit from the year i64 variable
+    (((year >> 63) & 1) + year) % 4 == 0
 }
 
 fn extract_seconds_and_nanoseconds(seconds: f32) -> (u64, u32) {
