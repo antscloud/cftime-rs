@@ -1,6 +1,26 @@
-# CF Time
+<p align="center">
+    <a href="https://crates.io/crates/cftime-rs">
+        <img src="https://img.shields.io/crates/v/cftime-rs.svg" alt="Crates.io">
+    </a>
+    <a href="https://github.com/antscloud/cftime-rs/actions">
+        <img src="https://github.com/antscloud/cftime-rs/actions/workflows/ci.yaml/badge.svg" alt="CI/CD Status">
+    </a>
+    <a href="https://www.gnu.org/licenses/agpl-3.0">
+        <img src="https://img.shields.io/badge/License-AGPL_v3-blue.svg" alt="License: AGPL v3">
+    </a>
+</p>
 
-This repo is an implementation in `rust` of the [cf time](https://cfconventions.org/Data/cf-conventions/cf-conventions-1.10/cf-conventions.html#time-coordinate) convention.
+<p align="center">
+    <a href="https://docs.rs/cftime-rs/0.1.0/cftime_rs/index.html">Documentation</a>
+    |
+    <a href="https://crates.io/crates/cftime-rs">Crate</a>
+    |
+    <a href="https://github.com/antscloud/cftime-rs">Repo</a>
+</p>
+
+# `cftime-rs`
+
+`cftime-rs` is an implementation in `rust` of the [cf time](https://cfconventions.org/Data/cf-conventions/cf-conventions-1.10/cf-conventions.html#time-coordinate) convention.
 
 ## Installation
 
