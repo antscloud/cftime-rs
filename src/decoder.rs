@@ -1,3 +1,5 @@
+//! Module that implements the decode_cf method for `i32`, `i64`, `f32`, `f64`,  `Vec<i32>`, `Vec<i64>`, `Vec<f32>` and `Vec<f64>`.
+
 use crate::utils::get_datetime_and_unit_from_units;
 use crate::{calendars::Calendar, datetime::CFDatetime};
 pub trait CFDecoder {

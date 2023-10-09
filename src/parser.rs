@@ -1,3 +1,6 @@
+//! Module related to parsing the date units
+//! Create a `ParsedDatetime` from units
+
 use crate::{calendars::Calendar, duration::CFDuration};
 
 #[derive(Debug, PartialEq)]

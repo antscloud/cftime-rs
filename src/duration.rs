@@ -1,3 +1,7 @@
+//! Module related to duration
+//! These CFDuration can be added to a CFDateTime by using the `+` or `-` operator
+//! Internally it uses the timestamp in seconds representation
+
 use crate::{calendars::Calendar, constants, utils::normalize_nanoseconds};
 
 #[derive(Debug)]
@@ -20,7 +24,7 @@ impl CFDuration {
 
 impl CFDuration {
     /// Makes a new `Duration` with given number of years.
-    /// Depends on the Calendar definitions found in https://github.com/nco/nco/blob/master/data/udunits.dat
+    /// Depends on the Calendar definitions found in [udunits package](https://github.com/nco/nco/blob/master/data/udunits.dat)
     pub fn from_years(years: i64, calendar: Calendar) -> CFDuration {
         let secs_per_year = match calendar {
             Calendar::Gregorian => 365.2425 * constants::SECS_PER_DAY as f64,

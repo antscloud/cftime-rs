@@ -1,3 +1,5 @@
+//! Utils crate where common behaviour for computing dates are shared
+
 use crate::{
     calendars::Calendar,
     constants,

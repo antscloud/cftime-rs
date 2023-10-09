@@ -12,6 +12,8 @@ cargo install cftime-rs
 
 ### Decoding 
 
+Decoding needs units, and calendar and can work with `i32`, `i64`, `f32`, ``f64`` and their corresponding vector type `Vec<i32>`, `Vec<i64>`, `Vec<f32>` and `Vec<f64>`. From these type it return either a `CFDatetime` object or a `Vec<CFDatetime>`.
+
 ```rust
 use cftime_rs::calendars::Calendar;
 use cftime_rs::decoder::*;
@@ -39,6 +41,8 @@ will print :
 ```
 
 ### Encoding 
+
+Encoding needs units and calendar and can convert a `CFDatetime` object into an `i32`, `i64`, `f32` or  `f64` or a `Vec<CFDatetime>` into `Vec<i32>`, `Vec<i64>`, `Vec<f32>` or `Vec<f64>`.
 
 ```rust
 use cftime_rs::calendars::Calendar;
@@ -84,12 +88,12 @@ will print :
 
 ## Known issues
 While this date calculation library can handle a wide range of dates, from approximately -291,672,107,014 BC to 291,672,107,014 AD, there are some performance considerations you should be aware of.
-As you move further away from the reference date of 1970-01-01 00:00:00, the calculation speed may decrease significantly. This is because the library needs to account for leap years in various calendars.
+As you move further away from the reference date of 1970-01-01 00:00:00, the time of calculation increases. This is because the library needs to account for leap years in various calendars.
 
-Here is an example of the computation of the year 751 417 763 (i.e. tranforming timestamp in seconds to date) on my personal computer :
+Here is an example of the computation of 1_000_000_000_000_000 seconds using the units "seconds since 2000-01-01 00:00:00" on my personal computer in release mode :
 
-| Calendar          | Computation Time     |
-|-------------------|----------------------|
-| Standard Calendar | 1.6 seconds          |
-| Leap Day Calendar | 172.298 milliseconds |
-| 360-Day Calendar  | 1.142 microseconds   |
+| Calendar          | Computation Time |
+|-------------------|------------------|
+| Standard Calendar | 44.470405ms      |
+| Leap Day Calendar | 8.052179ms       |
+| 360-Day Calendar  | 12.834µs         |

@@ -1,3 +1,5 @@
+//! Module that implements the encode_cf method for`CFDatetime` and `Vec<CFDatetime>`.
+
 use crate::{
     calendars::Calendar,
     datetime::CFDatetime,

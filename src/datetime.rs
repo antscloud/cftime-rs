@@ -10,15 +10,13 @@ use crate::duration::CFDuration;
 
 use crate::utils::normalize_nanoseconds;
 use crate::{calendars::Calendar, constants};
-/// calendar represents the calendar to use
-/// timestamp represents the number of seconds since 1970-01-01 00:00:00 UTC
-/// nanoseconds represents the number of nanoseconds to add to the timestamp
+
 pub struct CFDatetime {
     inner: Box<dyn CalendarDatetime>,
 }
 
 /// Immplementation of the CF convention specifications :
-/// - https://cfconventions.org/Data/cf-conventions/cf-conventions-1.10/cf-conventions.html#time-coordinate
+/// - [CF Conventions](https://cfconventions.org/Data/cf-conventions/cf-conventions-1.10/cf-conventions.html#time-coordinate)
 impl CFDatetime {
     pub fn calendar(&self) -> Calendar {
         self.inner.calendar()

@@ -1,3 +1,5 @@
+//! Module defining the calendars and their methods
+
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Copy, Clone, Default)]
 pub enum Calendar {
     // alias of Standard
