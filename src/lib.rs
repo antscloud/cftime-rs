@@ -17,13 +17,13 @@
 //!     let units = "days since 2000-01-01 00:00:00";
 //!     let calendar = Calendar::from_str("standard").unwrap();
 //!     let datetimes = to_decode.decode_cf(units, calendar).unwrap();
-//!     for datetime in datetimes {
+//!     for (i, datetime) in datetimes.iter().enumerate() {
 //!         println!("{}", datetime);
 //!     }
 //! }
 //! ```
 //! will print :
-//! ```
+//! ```shell
 //! 2000-01-01 00:00:00.000
 //! 2000-01-02 00:00:00.000
 //! 2000-01-03 00:00:00.000
@@ -56,7 +56,7 @@
 //!     ]
 //!     .into_iter()
 //!     .collect();
-//!     // define the units
+//!     // Define the units
 //!     let units = "days since 2000-01-01 00:00:00";
 //!     // The type annotation for result allow us to cast to type we want
 //!     // here we use Vec<i64>
@@ -67,7 +67,7 @@
 //! }
 //! ```
 //! will print :
-//! ```
+//! ```shell
 //! 0
 //! 1
 //! 2
