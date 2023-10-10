@@ -57,6 +57,31 @@ impl_vec_cf_encoder!(i32);
 impl_vec_cf_encoder!(f32);
 impl_vec_cf_encoder!(f64);
 
+macro_rules! impl_vec_ref_cf_encoder {
+    ($type:ty) => {
+        impl CFEncoder<Vec<$type>> for Vec<&CFDatetime> {
+            fn encode_cf(
+                &self,
+                units: &str,
+                calendar: Calendar,
+            ) -> Result<Vec<$type>, crate::errors::Error> {
+                let (cf_datetime, unit) = get_datetime_and_unit_from_units(units, calendar)?;
+                let mut result: Vec<$type> = Vec::with_capacity(self.len());
+                for datetime in self {
+                    let duration = *datetime - &cf_datetime;
+                    result.push(unit_to_encode(&unit, duration) as $type);
+                }
+                Ok(result)
+            }
+        }
+    };
+}
+
+impl_vec_ref_cf_encoder!(i64);
+impl_vec_ref_cf_encoder!(i32);
+impl_vec_ref_cf_encoder!(f32);
+impl_vec_ref_cf_encoder!(f64);
+
 #[cfg(test)]
 mod tests {
     use super::*;

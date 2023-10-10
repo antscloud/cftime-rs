@@ -12,7 +12,7 @@ use crate::utils::normalize_nanoseconds;
 use crate::{calendars::Calendar, constants};
 
 pub struct CFDatetime {
-    inner: Box<dyn CalendarDatetime>,
+    inner: Box<dyn CalendarDatetime + Send + Sync>,
 }
 
 /// Immplementation of the CF convention specifications :

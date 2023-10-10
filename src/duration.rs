@@ -135,101 +135,47 @@ impl std::ops::Neg for CFDuration {
     }
 }
 
-impl std::ops::Mul<i64> for CFDuration {
-    type Output = CFDuration;
-    fn mul(self, rhs: i64) -> Self::Output {
-        Self::new(
-            self.seconds * rhs,
-            self.nanoseconds as i64 * rhs,
-            self.calendar,
-        )
-    }
+macro_rules! impl_mul_for_cf_duration_int {
+    ($which_dur:ty, $rhs_type:ty) => {
+        impl std::ops::Mul<$rhs_type> for $which_dur {
+            type Output = CFDuration;
+            fn mul(self, rhs: $rhs_type) -> Self::Output {
+                CFDuration::new(
+                    self.seconds * rhs as i64,
+                    self.nanoseconds as i64 * rhs as i64,
+                    self.calendar,
+                )
+            }
+        }
+    };
 }
 
-impl std::ops::Mul<i64> for &CFDuration {
-    type Output = CFDuration;
-    fn mul(self, rhs: i64) -> Self::Output {
-        CFDuration::new(
-            self.seconds * rhs,
-            self.nanoseconds as i64 * rhs,
-            self.calendar,
-        )
-    }
+impl_mul_for_cf_duration_int!(CFDuration, i64);
+impl_mul_for_cf_duration_int!(CFDuration, i32);
+impl_mul_for_cf_duration_int!(&CFDuration, i64);
+impl_mul_for_cf_duration_int!(&CFDuration, i32);
+
+macro_rules! impl_mul_for_cf_duration_float {
+    ($which_dur:ty, $rhs_type:ty) => {
+        impl std::ops::Mul<$rhs_type> for $which_dur {
+            type Output = CFDuration;
+            fn mul(self, rhs: $rhs_type) -> Self::Output {
+                // Classic (a+b)(d+c)
+                let mut new_seconds = (self.seconds as $rhs_type * rhs) as i64;
+                let mut new_ns = (self.nanoseconds as $rhs_type * rhs) as i64;
+                let (remaining_seconds, remaining_nanoseconds) = normalize_nanoseconds(new_ns);
+                new_seconds += remaining_seconds;
+                new_ns += remaining_nanoseconds as i64;
+                CFDuration::new(new_seconds, new_ns, self.calendar)
+            }
+        }
+    };
 }
 
-impl std::ops::Mul<i32> for CFDuration {
-    type Output = CFDuration;
-    fn mul(self, rhs: i32) -> Self::Output {
-        Self::new(
-            self.seconds * rhs as i64,
-            self.nanoseconds as i64 * rhs as i64,
-            self.calendar,
-        )
-    }
-}
-
-impl std::ops::Mul<i32> for &CFDuration {
-    type Output = CFDuration;
-    fn mul(self, rhs: i32) -> Self::Output {
-        CFDuration::new(
-            self.seconds * rhs as i64,
-            self.nanoseconds as i64 * rhs as i64,
-            self.calendar,
-        )
-    }
-}
-
-impl std::ops::Mul<f64> for CFDuration {
-    type Output = CFDuration;
-    fn mul(self, rhs: f64) -> Self::Output {
-        let seconds_multiplier = (rhs / 1_000_000.0) as i64;
-        let nanoseconds_remaining = (rhs % 1_000_000.0) as i64;
-        Self::new(
-            self.seconds * seconds_multiplier,
-            nanoseconds_remaining,
-            self.calendar,
-        )
-    }
-}
-
-impl std::ops::Mul<f64> for &CFDuration {
-    type Output = CFDuration;
-    fn mul(self, rhs: f64) -> Self::Output {
-        let seconds_multiplier = (rhs / 1_000_000.0) as i64;
-        let nanoseconds_remaining = (rhs % 1_000_000.0) as i64;
-        CFDuration::new(
-            self.seconds * seconds_multiplier,
-            nanoseconds_remaining,
-            self.calendar,
-        )
-    }
-}
-
-impl std::ops::Mul<f32> for CFDuration {
-    type Output = CFDuration;
-    fn mul(self, rhs: f32) -> Self::Output {
-        let seconds_multiplier = (rhs as f64 / 1_000_000.0) as i64;
-        let nanoseconds_remaining = (rhs as f64 % 1_000_000.0) as i64;
-        Self::new(
-            self.seconds * seconds_multiplier,
-            nanoseconds_remaining,
-            self.calendar,
-        )
-    }
-}
-
-impl std::ops::Mul<f32> for &CFDuration {
-    type Output = CFDuration;
-    fn mul(self, rhs: f32) -> Self::Output {
-        let seconds_multiplier = (rhs as f64 / 1_000_000.0) as i64;
-        let nanoseconds_remaining = (rhs as f64 % 1_000_000.0) as i64;
-        CFDuration::new(
-            self.seconds * seconds_multiplier,
-            nanoseconds_remaining,
-            self.calendar,
-        )
-    }
-}
+impl_mul_for_cf_duration_float!(CFDuration, f64);
+impl_mul_for_cf_duration_float!(CFDuration, f32);
+impl_mul_for_cf_duration_float!(&CFDuration, f64);
+impl_mul_for_cf_duration_float!(&CFDuration, f32);
 
 #[cfg(test)]
 mod tests {
