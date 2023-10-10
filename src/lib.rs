@@ -99,5 +99,6 @@ pub mod duration;
 pub mod encoder;
 pub mod errors;
 pub mod parser;
+pub mod py_bindings;
 pub mod timezone;
 pub mod utils;
