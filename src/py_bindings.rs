@@ -1,6 +1,5 @@
 use crate::calendars::Calendar;
-use crate::datetime::{self, CFDatetime};
-use crate::decoder::CFDecoder;
+use crate::datetime::CFDatetime;
 use crate::duration::CFDuration;
 use crate::encoder::CFEncoder;
 use crate::{constants, decoder::*};
@@ -225,7 +224,7 @@ impl PyCFDatetime {
         self.dt.nanoseconds()
     }
     fn __repr__(&self) -> String {
-        format!("PyCFDatetime({})", self.dt.to_string())
+        format!("PyCFDatetime({})", self.dt)
     }
     fn __str__(&self) -> String {
         self.dt.to_string()
