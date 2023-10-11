@@ -1,6 +1,6 @@
 [package]
 name = "cftime-rs"
-version = "0.1.2"
+version = "0.1.3"
 edition = "2021"
 authors = ["Antoine Gibek"]
 categories = ["command-line-utilities"]
