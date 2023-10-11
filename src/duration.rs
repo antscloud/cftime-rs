@@ -107,31 +107,67 @@ impl CFDuration {
     }
 }
 
-impl std::ops::Add for CFDuration {
-    type Output = CFDuration;
-    fn add(self, rhs: Self) -> Self::Output {
-        Self::new(
-            self.seconds + rhs.seconds,
-            self.nanoseconds as i64 + rhs.nanoseconds as i64,
-            self.calendar,
+impl std::fmt::Display for CFDuration {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        // P18Y9M4DT11H9M8S
+        write!(
+            f,
+            "P{}Y{}M{}DT{}H{}M{}S",
+            self.num_years() as i64,
+            self.num_months() as i64 % 12,
+            self.num_days() as i64 % 31,
+            self.num_hours() as i64 % 24,
+            self.num_minutes() as i64 % 60,
+            self.num_seconds() as i64 % 60
         )
     }
 }
 
-impl std::ops::Sub for CFDuration {
-    type Output = CFDuration;
-    fn sub(self, rhs: Self) -> Self::Output {
-        Self::new(
-            self.seconds - rhs.seconds,
-            self.nanoseconds as i64 - rhs.nanoseconds as i64,
-            self.calendar,
-        )
-    }
+macro_rules! impl_add_for_cf_duration {
+    ($self_dur:ty, $rhs_dur:ty) => {
+        impl std::ops::Add for $self_dur {
+            type Output = CFDuration;
+            fn add(self, rhs: $rhs_dur) -> Self::Output {
+                CFDuration::new(
+                    self.seconds + rhs.seconds,
+                    self.nanoseconds as i64 + rhs.nanoseconds as i64,
+                    self.calendar,
+                )
+            }
+        }
+    };
 }
+impl_add_for_cf_duration!(CFDuration, CFDuration);
+impl_add_for_cf_duration!(&CFDuration, &CFDuration);
+
+macro_rules! impl_sub_for_cf_duration {
+    ($self_dur:ty, $rhs_dur:ty) => {
+        impl std::ops::Sub for $self_dur {
+            type Output = CFDuration;
+            fn sub(self, rhs: $rhs_dur) -> Self::Output {
+                CFDuration::new(
+                    self.seconds - rhs.seconds,
+                    self.nanoseconds as i64 - rhs.nanoseconds as i64,
+                    self.calendar,
+                )
+            }
+        }
+    };
+}
+
+impl_sub_for_cf_duration!(CFDuration, CFDuration);
+impl_sub_for_cf_duration!(&CFDuration, &CFDuration);
+
 impl std::ops::Neg for CFDuration {
     type Output = CFDuration;
     fn neg(self) -> Self::Output {
         Self::new(-self.seconds, -(self.nanoseconds as i64), self.calendar)
+    }
+}
+impl std::ops::Neg for &CFDuration {
+    type Output = CFDuration;
+    fn neg(self) -> Self::Output {
+        CFDuration::new(-self.seconds, -(self.nanoseconds as i64), self.calendar)
     }
 }
 
