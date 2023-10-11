@@ -1,12 +1,15 @@
 <p align="center">
     <a href="https://crates.io/crates/cftime-rs">
-        <img src="https://img.shields.io/crates/v/cftime-rs.svg" alt="Crates.io">
+        <img src="https://img.shields.io/crates/v/cftime-rs.svg" alt="Crates.io version badge">
     </a>
     <a href="https://github.com/antscloud/cftime-rs/actions">
         <img src="https://github.com/antscloud/cftime-rs/actions/workflows/ci.yaml/badge.svg" alt="CI/CD Status">
     </a>
     <a href="https://www.gnu.org/licenses/agpl-3.0">
         <img src="https://img.shields.io/badge/License-AGPL_v3-blue.svg" alt="License: AGPL v3">
+    </a>
+        <a href="https://pypi.org/project/cftime-rs/">
+        <img src="https://img.shields.io/pypi/v/cftime-rs.svg" alt="Pypi version badge">
     </a>
 </p>
 
@@ -171,6 +174,7 @@ will print :
 5
 ```
 
+
 ## Known issues
 While this date calculation library can handle a wide range of dates, from approximately -291,672,107,014 BC to 291,672,107,014 AD, there are some performance considerations you should be aware of.
 As you move further away from the reference date of 1970-01-01 00:00:00, the time of calculation increases. This is because the library needs to account for leap years in various calendars.
@@ -182,4 +186,16 @@ Here is an example of the computation of 1_000_000_000_000_000 seconds using the
 | Standard Calendar | 44.470405ms      |
 | Leap Day Calendar | 8.052179ms       |
 | 360-Day Calendar  | 12.834µs         |
+
+## Comparison with cftime
+
+Here is a benchmark on my computer of two methods. This is not really rigorous but this is to give an idea.  
+
+We are comparing cftime with cftime_rs. The first method involves decoding a series of numbers using the standard calendar, calling the .str() method, and then re-encoding them to the same unit and calendar. The second method is to decode a series of numbers using the standard calendar and re-encode them to the same unit and calendar without calling .str(). Both methods are designed to be fair between the two libraries because cftime_rs only uses timestamps (i64) as its internal representation and never recalculates the year, month, day, hour, minutes, and seconds, except if you explicitly request this representation.
+
+
+<div style="display: flex; align-items: center; justify-content: center">
+    <img src="./benchmark/performance_comparison_with_str.png" alt="First method" width="45%">
+    <img src="./benchmark/performance_comparison_without_str.png" alt="Second method" width="45%">
+</div>
 

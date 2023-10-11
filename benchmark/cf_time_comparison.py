@@ -4,6 +4,7 @@ import cftime
 import time
 import matplotlib.pyplot as plt
 from typing import Tuple
+import os
 
 ITERATIONS = [1, 10, 50, 100, 500, 1000, 5000, 10000, 50000, 100000, 500000, 1000000]
 UNITS = "hours since 2000-01-01 00:00:00"
@@ -19,7 +20,7 @@ def performance_comparison_chart():
     cftime_times = []
 
     for n in ITERATIONS:
-        print(f"Number of Iterations: {n}")
+        print(f"Number of Iterations with str: {n}")
         arr = np.array(range(n))
 
         cftime_rs_duration = cftime_rs_benchmark(arr)
@@ -68,14 +69,14 @@ def performance_comparison_chart():
         marker="o",
         color="green",
         label="Performance Improvement (%)",
-        alpha=0.7,
+        alpha=0.4,
     )
     ax2.set_ylabel("Performance Improvement (%)")
 
     ax1.legend(loc="upper left")
     ax2.legend(loc="upper right")
 
-    plt.savefig("performance_comparison_with_str.png")
+    plt.savefig(os.path.join(os.path.dirname(__file__), "performance_comparison_with_str.png"))
 
 
 def cftime_benchmark(arr: np.array) -> float:
@@ -107,8 +108,8 @@ def performance_comparison_chart_without_str():
     cftime_times = []
 
     for n in ITERATIONS:
+        print(f"Number of Iterations without str: {n}")
         arr = np.array(range(n))
-
         cftime_rs_duration = cftime_rs_benchmark_without_str(arr)
         cftime_rs_times.append(cftime_rs_duration)
         cftime_duration = cftime_benchmark_without_str(arr)
@@ -156,12 +157,12 @@ def performance_comparison_chart_without_str():
         marker="o",
         color="green",
         label="Performance Improvement (%)",
-        alpha=0.7,
+        alpha=0.4,
     )
     ax2.set_ylabel("Performance Improvement (%)")
     ax2.legend(loc="upper right")
 
-    plt.savefig("performance_comparison_without_str.png")
+    plt.savefig(os.path.join(os.path.dirname(__file__), "performance_comparison_without_str.png"))
 
 
 def cftime_benchmark_without_str(arr: np.array) -> float:
