@@ -6,7 +6,19 @@ use crate::{
     utils::{get_datetime_and_unit_from_units, unit_to_encode},
 };
 
+/// This trait represents a CFEncoder.
+/// A CFEncoder is responsible for encoding [CFDatetime] into a specific format.
 pub trait CFEncoder<T> {
+    /// Encodes the data into a specific format.
+    ///
+    /// # Arguments
+    ///
+    /// * `units` - The units of the data.
+    /// * `calendar` - The calendar to use.
+    ///
+    /// # Returns
+    ///
+    /// The encoded data as a Result<T, crate::errors::Error>.
     fn encode_cf(&self, units: &str, calendar: Calendar) -> Result<T, crate::errors::Error>;
 }
 
@@ -19,7 +31,7 @@ macro_rules! impl_cf_encoder {
                 calendar: Calendar,
             ) -> Result<$type, crate::errors::Error> {
                 let (cf_datetime, unit) = get_datetime_and_unit_from_units(units, calendar)?;
-                let duration = self - cf_datetime;
+                let duration = (self - cf_datetime)?;
                 let result = unit_to_encode(&unit, duration);
                 Ok(result as $type)
             }
@@ -43,7 +55,7 @@ macro_rules! impl_vec_cf_encoder {
                 let (cf_datetime, unit) = get_datetime_and_unit_from_units(units, calendar)?;
                 let mut result: Vec<$type> = Vec::with_capacity(self.len());
                 for datetime in self {
-                    let duration = datetime - &cf_datetime;
+                    let duration = (datetime - &cf_datetime)?;
                     result.push(unit_to_encode(&unit, duration) as $type);
                 }
                 Ok(result)
@@ -68,7 +80,7 @@ macro_rules! impl_vec_ref_cf_encoder {
                 let (cf_datetime, unit) = get_datetime_and_unit_from_units(units, calendar)?;
                 let mut result: Vec<$type> = Vec::with_capacity(self.len());
                 for datetime in self {
-                    let duration = *datetime - &cf_datetime;
+                    let duration = (*datetime - &cf_datetime)?;
                     result.push(unit_to_encode(&unit, duration) as $type);
                 }
                 Ok(result)

@@ -4,6 +4,7 @@
 
 use crate::{calendars::Calendar, constants, utils::normalize_nanoseconds};
 
+/// A CF duration
 #[derive(Debug)]
 pub struct CFDuration {
     pub seconds: i64,
@@ -23,93 +24,123 @@ impl CFDuration {
 }
 
 impl CFDuration {
+    /// Returns the calendar
+    pub fn calendar(&self) -> Calendar {
+        self.calendar
+    }
     /// Makes a new `Duration` with given number of years.
-    /// Depends on the Calendar definitions found in [udunits package](https://github.com/nco/nco/blob/master/data/udunits.dat)
+    /// Depends on the Calendar definitions found in  the CF conventions
+    /// See also [Calendar]
     pub fn from_years(years: i64, calendar: Calendar) -> CFDuration {
         let secs_per_year = match calendar {
             Calendar::Gregorian => 365.2425 * constants::SECS_PER_DAY as f64,
             Calendar::ProlepticGregorian | Calendar::Standard => 3.15569259747e7,
-            Calendar::NoLeap | Calendar::Day365 => 365.0 * constants::SECS_PER_DAY as f64,
-            Calendar::AllLeap | Calendar::Day366 => 366.0 * constants::SECS_PER_DAY as f64,
+            Calendar::NoLeap => 365.0 * constants::SECS_PER_DAY as f64,
+            Calendar::AllLeap => 366.0 * constants::SECS_PER_DAY as f64,
             Calendar::Julian => 365.25 * constants::SECS_PER_DAY as f64,
             Calendar::Day360 => 360.0 * constants::SECS_PER_DAY as f64,
         };
         let secs = secs_per_year as i64 * years;
         Self::new(secs, 0, calendar)
     }
-
+    /// Makes a new `Duration` with given number of months.
     pub fn from_months(months: i64, calendar: Calendar) -> CFDuration {
         let seconds_for_one_year = CFDuration::from_years(1, calendar).seconds;
         Self::new(seconds_for_one_year / 12 * months, 0, calendar)
     }
+    /// Makes a new `Duration` with given number of weeks
     pub fn from_weeks(weeks: i64, calendar: Calendar) -> CFDuration {
         Self::new(weeks * 7 * 24 * 60 * 60, 0, calendar)
     }
+    /// Makes a new `Duration` with given number of days
     pub fn from_days(days: i64, calendar: Calendar) -> CFDuration {
         Self::new(days * 24 * 60 * 60, 0, calendar)
     }
+    /// Makes a new `Duration` with given number of hours
     pub fn from_hours(hours: i64, calendar: Calendar) -> CFDuration {
         Self::new(hours * 60 * 60, 0, calendar)
     }
+    /// Makes a new `Duration` with given number of minutes
     pub fn from_minutes(minutes: i64, calendar: Calendar) -> CFDuration {
         Self::new(minutes * 60, 0, calendar)
     }
+    /// Makes a new `Duration` with given number of seconds
     pub fn from_seconds(seconds: i64, calendar: Calendar) -> CFDuration {
         Self::new(seconds, 0, calendar)
     }
+    /// Makes a new `Duration` with given number of milliseconds
     pub fn from_milliseconds(milliseconds: i64, calendar: Calendar) -> CFDuration {
         Self::new(0, milliseconds * 1_000_000, calendar)
     }
+    /// Makes a new `Duration` with given number of microseconds
     pub fn from_microseconds(microseconds: i64, calendar: Calendar) -> CFDuration {
         Self::new(0, 1_000 * microseconds, calendar)
     }
+    /// Makes a new `Duration` with given number of nanoseconds
     pub fn from_nanoseconds(nanoseconds: i64, calendar: Calendar) -> CFDuration {
         Self::new(0, nanoseconds, calendar)
     }
+    /// Return the total number of years in the duration.
     pub fn num_years(&self) -> f64 {
         match self.calendar {
             Calendar::Gregorian => self.num_days() / 365.2425,
             Calendar::ProlepticGregorian | Calendar::Standard => {
                 self.num_seconds() / 3.15569259747e7
             }
-            Calendar::NoLeap | Calendar::Day365 => self.num_days() / 365.0,
-            Calendar::AllLeap | Calendar::Day366 => self.num_days() / 366.0,
+            Calendar::NoLeap => self.num_days() / 365.0,
+            Calendar::AllLeap => self.num_days() / 366.0,
             Calendar::Julian => self.num_days() / 365.25,
             Calendar::Day360 => self.num_days() / 360.0,
         }
     }
+    /// Return the total number of motnhs in the duration.
     pub fn num_months(&self) -> f64 {
         self.num_years() * 12.
     }
+    /// Return the total number of weeks in the duration.
     pub fn num_weeks(&self) -> f64 {
         self.num_days() / 7.
     }
+    /// Return the total number of days in the duration.
     pub fn num_days(&self) -> f64 {
         self.num_hours() / 24.
     }
+    /// Return the total number of hours in the duration.
     pub fn num_hours(&self) -> f64 {
         self.num_minutes() / 60.
     }
+    /// Return the total number of minutes in the duration.
     pub fn num_minutes(&self) -> f64 {
         self.num_seconds() / 60.0
     }
+    /// Return the total number of seconds in the duration.
     pub fn num_seconds(&self) -> f64 {
         self.seconds as f64 + self.nanoseconds as f64 / 1e9
     }
+    /// Return the total number of milliseconds in the duration.
     pub fn num_milliseconds(&self) -> f64 {
         self.num_seconds() * 1e3
     }
+    /// Return the total number of microseconds in the duration.
     pub fn num_microseconds(&self) -> f64 {
         self.num_seconds() * 1e6
     }
+    /// Return the total number of nanoseconds in the duration.
     pub fn num_nanoseconds(&self) -> f64 {
         (self.seconds * 1_000_000_000 + self.nanoseconds as i64) as f64
     }
 }
 
+/// Display a CFDuration with te ISO 8601 format of duration.
+///
+/// # Example
+/// ```
+/// CFDuration::from_days(1).__repr__()
+/// assert_eq!(CFDuration::from_days(1).__repr__(),  "P0Y0M1DT0H0M0S");
+/// ```
+///
 impl std::fmt::Display for CFDuration {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        // P18Y9M4DT11H9M8S
         write!(
             f,
             "P{}Y{}M{}DT{}H{}M{}S",
@@ -226,8 +257,8 @@ mod tests {
             calendars::Calendar::Standard,
             calendars::Calendar::ProlepticGregorian,
             calendars::Calendar::Julian,
-            calendars::Calendar::Day365,
-            calendars::Calendar::Day366,
+            calendars::Calendar::NoLeap,
+            calendars::Calendar::AllLeap,
         ];
         for cal in cals.clone() {
             println!("{}", cal);

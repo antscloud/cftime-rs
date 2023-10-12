@@ -2,7 +2,19 @@
 
 use crate::utils::get_datetime_and_unit_from_units;
 use crate::{calendars::Calendar, datetime::CFDatetime};
+
+/// Trait for decoding CFDatetime from units and calendar
 pub trait CFDecoder {
+    /// Decodes the given units and calendar into a CFDatetime.
+    ///
+    /// # Arguments
+    ///
+    /// * `units` - The units to decode.
+    /// * `calendar` - The calendar to use for decoding.
+    ///
+    /// # Returns
+    ///
+    /// A Result containing the decoded CFDatetime if successful, or an Error if decoding fails.
     fn decode_cf(
         &self,
         units: &str,

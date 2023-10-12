@@ -1,30 +1,29 @@
 //! Module defining the calendars and their methods
 
+/// Represents the different types of calendars based on the
+/// CF Conventions.
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Copy, Clone, Default)]
 pub enum Calendar {
     // alias of Standard
     Gregorian,
-    Standard,
     #[default]
+    Standard,
     ProlepticGregorian,
-    Day365,
-    // Same as 365 days
     NoLeap,
-    Day366,
-    // Same as Day366
     AllLeap,
     Julian,
     Day360,
 }
 
+/// Convert the calendar to a good formatted string
 impl std::fmt::Display for Calendar {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         let name = match *self {
             Calendar::Gregorian => "Gregorian",
             Calendar::Standard => "Standard",
             Calendar::ProlepticGregorian => "Proleptic Gregorian",
-            Calendar::NoLeap | Calendar::Day365 => "No Leap",
-            Calendar::AllLeap | Calendar::Day366 => "All Leap",
+            Calendar::NoLeap => "No Leap",
+            Calendar::AllLeap => "All Leap",
             Calendar::Julian => "Julian",
             Calendar::Day360 => "360 Day",
         };
@@ -32,6 +31,8 @@ impl std::fmt::Display for Calendar {
     }
 }
 
+/// Convert a valid cf unit calendar string to a Calendar
+/// If no valid string is provided, Standard is returned
 impl std::str::FromStr for Calendar {
     type Err = crate::errors::Error;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
@@ -39,9 +40,8 @@ impl std::str::FromStr for Calendar {
             "gregorian" => Ok(Calendar::Gregorian),
             "standard" => Ok(Calendar::Standard),
             "proleptic_gregorian" => Ok(Calendar::ProlepticGregorian),
-            "no_leap" => Ok(Calendar::NoLeap),
-            "day365" => Ok(Calendar::Day365),
-            "all_leap" => Ok(Calendar::AllLeap),
+            "no_leap" | "day365" => Ok(Calendar::NoLeap),
+            "all_leap" | "day366" => Ok(Calendar::AllLeap),
             "julian" => Ok(Calendar::Julian),
             "360_day" => Ok(Calendar::Day360),
             _ => Ok(Calendar::Standard),

@@ -12,6 +12,8 @@ pub enum Error {
     InvalidTz(String),
     #[error("Invalid unit : {0}")]
     UnitParserError(String),
+    #[error("Different calendars found : {0} and {1}.")]
+    DifferentCalendars(String, String),
     // Parseint error from std
     #[error("{0}")]
     ParseIntError(#[from] std::num::ParseIntError),
