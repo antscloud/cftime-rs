@@ -1,6 +1,6 @@
 # flake8: noqa
 
-from typing import Iterable, Union, List
+from typing import Iterable, Union, List, Tuple
 
 class PyCFDuration:
     """PyCFDuration is a wrapper around Rust CFDuration.
