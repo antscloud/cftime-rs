@@ -436,6 +436,30 @@ class PyCFDatetime:
         """
     ...
 
+    def to_pydatetime(self) -> dt.datetime:
+        """
+        Converts the object to a Python datetime object using year, month, day, hour, minute,
+        and second
+
+        Returns:
+            A datetime object representing the same date and time as the object.
+
+        Raises:
+            ValueError: If the date cannot be converted to a datetime
+        """
+        ...
+    def to_pydatetime_with_timestamp(self) -> dt.datetime:
+        """
+        Converts the object to a Python datetime object using the timestamp
+
+        Returns:
+            A datetime object representing the same underlying timestamp
+
+        Raises:
+            ValueError: If the date cannot be converted to a datetime
+        """
+        ...
+
 def num2date(
     arr: Iterable[Union[int, float]],
     units: str,
@@ -464,6 +488,34 @@ def num2date(
     """
     ...
 
+def num2pydate(
+    arr: Iterable[Union[int, float]],
+    units: str,
+    calendar: str,
+) -> List[dt.datetime]:
+    """Convert a list of numbers to datetime objects based on the specified calendar.
+
+    Args:
+        arr : Iterable[Union[int, float]]
+            Array of numbers to convert to datetime
+        units : str
+            Valid CF units
+        calendar : str
+            CF calendar name. Should be one of "standard", "gregorian",
+            "proleptic_gregorian", "julian", "all_leap", "no_leap", "360_day", "365_day", "366_day".
+            If the calendar is not recognized, "standard" will be used
+
+    Raises:
+        ValueError
+            If the date is not valid in the calendar
+
+    Returns:
+        List[datetime.datetime]
+            List of datetime.datetime objects
+
+    """
+    ...
+
 def date2num(
     datetimes: List[PyCFDatetime],
     units: str,
@@ -476,6 +528,45 @@ def date2num(
     Args:
         datetimes : List[PyCFDatetime]
             List of PyCFDatetime objects
+        units : str
+            Valid CF units
+        calendar : str
+            CF calendar name. Should be one of "standard", "gregorian",
+        dtype : str
+            32 bit integer : "i32"
+            64 bit integer : "i64", "i", "integer", "int"
+            32 bit float   : "f32"
+            64 bit float   :  "f64", "f", "float"
+
+    Raises:
+        ValueError
+            If the date is not valid in the calendar
+        ValueError
+            If the dtype is not recognized
+
+    Returns:
+        Union[int, float]
+            List of numbers based on calendar, units, and dtype
+    """
+    ...
+
+import datetime as dt
+
+def pydate2num(
+    datetimes: List[dt.datetime],
+    units: str,
+    calendar: str,
+    dtype: str,
+) -> Union[int, float]:
+    """Convert a list of python datetime to a list of numbers based on calendar, units, and dtype.
+
+    Since the backend is implemented in Rust, we need to call python datetimes arguments
+    in order to convert them to rust object. This inevitably leads to a lot of overhead and
+    lower performance thant using num2date.
+
+    Args:
+        datetimes : List[datetime.datetime]
+            List of python datetime.datetime objects
         units : str
             Valid CF units
         calendar : str
