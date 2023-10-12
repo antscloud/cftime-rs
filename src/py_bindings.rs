@@ -5,9 +5,9 @@ use crate::encoder::CFEncoder;
 use crate::{constants, decoder::*};
 use pyo3::exceptions::PyValueError;
 use pyo3::prelude::*;
+use pyo3::types::PyDateTime;
 use std::str::FromStr;
 use std::sync::Arc;
-
 #[pyclass]
 #[derive(Clone)]
 pub struct PyCFCalendar {
@@ -163,16 +163,18 @@ impl PyCFDuration {
         self.duration.to_string()
     }
 
-    pub fn __sub__(&self, other: &PyCFDuration) -> PyCFDuration {
-        PyCFDuration {
-            duration: &self.duration - &other.duration,
-        }
+    pub fn __sub__(&self, other: &PyCFDuration) -> PyResult<PyCFDuration> {
+        Ok(PyCFDuration {
+            duration: (&self.duration - &other.duration)
+                .map_err(|e| PyValueError::new_err(format!("{}", e)))?,
+        })
     }
 
-    pub fn __add__(&self, other: &PyCFDuration) -> PyCFDuration {
-        PyCFDuration {
-            duration: &self.duration + &other.duration,
-        }
+    pub fn __add__(&self, other: &PyCFDuration) -> PyResult<PyCFDuration> {
+        Ok(PyCFDuration {
+            duration: (&self.duration + &other.duration)
+                .map_err(|e| PyValueError::new_err(format!("{}", e)))?,
+        })
     }
 
     pub fn __neg__(&self) -> PyCFDuration {
@@ -339,6 +341,32 @@ impl PyCFDatetime {
         // Create a new DateTime object with the updated dt value
         Ok(Self { dt: new_dt.into() })
     }
+
+    fn to_pydatetime<'a>(&self, py: Python<'a>) -> PyResult<&'a PyDateTime> {
+        let (year, month, day, hour, minute, second) = self
+            .ymd_hms()
+            .map_err(|e| PyValueError::new_err(format!("Could not convert to datetime: {}", e)))?;
+        let nanoseconds = self.nanoseconds();
+        let microsecond = nanoseconds / 1_000;
+        PyDateTime::new(
+            py,
+            year as i32,
+            month,
+            day,
+            hour,
+            minute,
+            second,
+            microsecond as u32,
+            None,
+        )
+    }
+    fn to_pydatetime_with_timestamp<'a>(&self, py: Python<'a>) -> PyResult<&'a PyDateTime> {
+        PyDateTime::from_timestamp(
+            py,
+            self.dt.timestamp() as f64 + self.dt.nanoseconds() as f64 / 1e9,
+            None,
+        )
+    }
     fn __repr__(&self) -> String {
         format!("PyCFDatetime({})", self.dt)
     }
@@ -392,6 +420,28 @@ fn num2date(numbers: &PyAny, units: String, calendar: String) -> PyResult<Vec<Py
         .collect())
 }
 
+#[pyfunction]
+fn num2pydate<'a>(
+    py: Python<'a>,
+    numbers: &'a PyAny,
+    units: String,
+    calendar: String,
+) -> PyResult<Vec<&'a PyDateTime>> {
+    let calendar = Calendar::from_str(calendar.as_str())
+        .map_err(|e| PyValueError::new_err(format!("Could not parse calendar: {}", e)))?;
+    let datetimes = decode_numbers!(numbers, units, calendar, i32, i64, f32, f64);
+
+    let mut pydatetimes = Vec::with_capacity(datetimes.len());
+    for dt in datetimes {
+        let py_dt = PyDateTime::from_timestamp(
+            py,
+            dt.timestamp() as f64 + dt.nanoseconds() as f64 / 1e9,
+            None,
+        )?;
+        pydatetimes.push(py_dt);
+    }
+    Ok(pydatetimes)
+}
 enum DType {
     Int32,
     Int64,
@@ -428,9 +478,98 @@ fn date2num(
 ) -> PyResult<PyObject> {
     let calendar = Calendar::from_str(calendar.as_str())
         .map_err(|e| PyValueError::new_err(format!("Could not parse calendar: {}", e)))?;
-    let dts: Vec<&CFDatetime> = datetimes.iter().map(|pydatetime| &*pydatetime.dt).collect();
     let dtype_enum = DType::from_str(dtype.as_str())
         .map_err(|e| PyValueError::new_err(format!("Could not parse dtype: {}", e)))?;
+    let dts: Vec<&CFDatetime> = datetimes.iter().map(|pydatetime| &*pydatetime.dt).collect();
+    match dtype_enum {
+        DType::Int32 => {
+            let numbers: Vec<i32> = dts
+                .encode_cf(units.as_str(), calendar)
+                .map_err(|e| PyValueError::new_err(format!("Could not encode datetimes: {}", e)))?;
+            Ok(numbers.into_py(py))
+        }
+        DType::Int64 => {
+            let numbers: Vec<i64> = dts
+                .encode_cf(units.as_str(), calendar)
+                .map_err(|e| PyValueError::new_err(format!("Could not encode datetimes: {}", e)))?;
+            Ok(numbers.into_py(py))
+        }
+        DType::Float32 => {
+            let numbers: Vec<f32> = dts
+                .encode_cf(units.as_str(), calendar)
+                .map_err(|e| PyValueError::new_err(format!("Could not encode datetimes: {}", e)))?;
+            Ok(numbers.into_py(py))
+        }
+        DType::Float64 => {
+            let numbers: Vec<f64> = dts
+                .encode_cf(units.as_str(), calendar)
+                .map_err(|e| PyValueError::new_err(format!("Could not encode datetimes: {}", e)))?;
+            Ok(numbers.into_py(py))
+        }
+        DType::Unknown => Err(PyValueError::new_err(format!(
+            "Invalid dtype `{}`. For i32 use {}. For i64 use {}. For f32 use {}. For f64 use {}.",
+            dtype,
+            INT_32_TYPES.join(", "),
+            INT_64_TYPES.join(", "),
+            FLOAT_32_TYPES.join(", "),
+            FLOAT_64_TYPES.join(", ")
+        ))),
+    }
+}
+// Create a newtype wrapper for Vec<PyDateTime>
+
+pub struct PyDateTimeList<'a> {
+    datetimes: Vec<&'a PyDateTime>,
+}
+
+impl<'a> pyo3::FromPyObject<'a> for PyDateTimeList<'a> {
+    fn extract(obj: &'a PyAny) -> pyo3::PyResult<Self> {
+        let py_list = obj.downcast::<pyo3::types::PyList>()?;
+        let mut datetimes = Vec::with_capacity(py_list.len());
+        for elem in py_list {
+            let py_dt = elem.extract::<&PyDateTime>()?;
+            datetimes.push(py_dt);
+        }
+        Ok(PyDateTimeList {
+            datetimes: datetimes,
+        })
+    }
+}
+
+#[pyfunction]
+fn pydate2num(
+    py: Python,
+    datetimes: PyDateTimeList,
+    units: String,
+    calendar: String,
+    dtype: String,
+) -> PyResult<PyObject> {
+    let calendar = Calendar::from_str(calendar.as_str())
+        .map_err(|e| PyValueError::new_err(format!("Could not parse calendar: {}", e)))?;
+    let dtype_enum = DType::from_str(dtype.as_str())
+        .map_err(|e| PyValueError::new_err(format!("Could not parse dtype: {}", e)))?;
+    let mut dts: Vec<CFDatetime> = Vec::with_capacity(datetimes.datetimes.len());
+
+    for pydt in datetimes.datetimes.iter() {
+        let year = pydt.getattr("year")?.extract::<i64>()?;
+        let month = pydt.getattr("month")?.extract::<u8>()?;
+        let day = pydt.getattr("day")?.extract::<u8>()?;
+        let hour = pydt.getattr("hour")?.extract::<u8>()?;
+        let minute = pydt.getattr("minute")?.extract::<u8>()?;
+        let second = pydt.getattr("second")?.extract::<u8>()?;
+        let microsecond = pydt.getattr("microsecond")?.extract::<u32>()?;
+        let new_second = second as f32 + (microsecond / 1_000_000) as f32;
+        dts.push(
+            CFDatetime::from_ymd_hms(year, month, day, hour, minute, new_second, calendar)
+                .map_err(|e| {
+                    PyValueError::new_err(format!(
+                        "Could not convert datetime to CFDatetime: {}",
+                        e
+                    ))
+                })?,
+        );
+    }
+
     match dtype_enum {
         DType::Int32 => {
             let numbers: Vec<i32> = dts
@@ -472,6 +611,8 @@ fn date2num(
 fn cftime_rs(_py: Python, m: &PyModule) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(num2date, m)?)?;
     m.add_function(wrap_pyfunction!(date2num, m)?)?;
+    m.add_function(wrap_pyfunction!(num2pydate, m)?)?;
+    m.add_function(wrap_pyfunction!(pydate2num, m)?)?;
     m.add_class::<PyCFCalendar>()?;
     m.add_class::<PyCFDuration>()?;
     m.add_class::<PyCFDatetime>()?;

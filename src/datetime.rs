@@ -108,7 +108,7 @@ impl CFDatetime {
                     year, month, day, hour, minute, second,
                 )?),
             }),
-            Calendar::Standard | Calendar::Gregorian => Ok(Self {
+            Calendar::Standard => Ok(Self {
                 inner: Box::new(StandardDatetime::from_ymd_hms(
                     year, month, day, hour, minute, second,
                 )?),
@@ -192,7 +192,7 @@ impl CFDatetime {
                     nanoseconds,
                 )),
             }),
-            Calendar::Standard | Calendar::Gregorian => Ok(Self {
+            Calendar::Standard => Ok(Self {
                 inner: Box::new(StandardDatetime::from_timestamp(timestamp, nanoseconds)),
             }),
             Calendar::Day360 => Ok(Self {

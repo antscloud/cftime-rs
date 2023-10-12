@@ -33,7 +33,6 @@ impl CFDuration {
     /// See also [Calendar]
     pub fn from_years(years: i64, calendar: Calendar) -> CFDuration {
         let secs_per_year = match calendar {
-            Calendar::Gregorian => 365.2425 * constants::SECS_PER_DAY as f64,
             Calendar::ProlepticGregorian | Calendar::Standard => 3.15569259747e7,
             Calendar::NoLeap => 365.0 * constants::SECS_PER_DAY as f64,
             Calendar::AllLeap => 366.0 * constants::SECS_PER_DAY as f64,
@@ -83,7 +82,6 @@ impl CFDuration {
     /// Return the total number of years in the duration.
     pub fn num_years(&self) -> f64 {
         match self.calendar {
-            Calendar::Gregorian => self.num_days() / 365.2425,
             Calendar::ProlepticGregorian | Calendar::Standard => {
                 self.num_seconds() / 3.15569259747e7
             }
@@ -157,13 +155,19 @@ impl std::fmt::Display for CFDuration {
 macro_rules! impl_add_for_cf_duration {
     ($self_dur:ty, $rhs_dur:ty) => {
         impl std::ops::Add for $self_dur {
-            type Output = CFDuration;
+            type Output = Result<CFDuration, crate::errors::Error>;
             fn add(self, rhs: $rhs_dur) -> Self::Output {
-                CFDuration::new(
+                if self.calendar() != rhs.calendar() {
+                    return Err(crate::errors::Error::DifferentCalendars(
+                        self.calendar().to_string(),
+                        rhs.calendar().to_string(),
+                    ));
+                }
+                Ok(CFDuration::new(
                     self.seconds + rhs.seconds,
                     self.nanoseconds as i64 + rhs.nanoseconds as i64,
                     self.calendar,
-                )
+                ))
             }
         }
     };
@@ -174,13 +178,19 @@ impl_add_for_cf_duration!(&CFDuration, &CFDuration);
 macro_rules! impl_sub_for_cf_duration {
     ($self_dur:ty, $rhs_dur:ty) => {
         impl std::ops::Sub for $self_dur {
-            type Output = CFDuration;
+            type Output = Result<CFDuration, crate::errors::Error>;
             fn sub(self, rhs: $rhs_dur) -> Self::Output {
-                CFDuration::new(
+                if self.calendar() != rhs.calendar() {
+                    return Err(crate::errors::Error::DifferentCalendars(
+                        self.calendar().to_string(),
+                        rhs.calendar().to_string(),
+                    ));
+                }
+                Ok(CFDuration::new(
                     self.seconds - rhs.seconds,
                     self.nanoseconds as i64 - rhs.nanoseconds as i64,
                     self.calendar,
-                )
+                ))
             }
         }
     };

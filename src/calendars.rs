@@ -5,7 +5,6 @@
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Copy, Clone, Default)]
 pub enum Calendar {
     // alias of Standard
-    Gregorian,
     #[default]
     Standard,
     ProlepticGregorian,
@@ -19,7 +18,6 @@ pub enum Calendar {
 impl std::fmt::Display for Calendar {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         let name = match *self {
-            Calendar::Gregorian => "Gregorian",
             Calendar::Standard => "Standard",
             Calendar::ProlepticGregorian => "Proleptic Gregorian",
             Calendar::NoLeap => "No Leap",
@@ -37,8 +35,7 @@ impl std::str::FromStr for Calendar {
     type Err = crate::errors::Error;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s.trim().to_lowercase().as_str() {
-            "gregorian" => Ok(Calendar::Gregorian),
-            "standard" => Ok(Calendar::Standard),
+            "standard" | "gregorian" => Ok(Calendar::Standard),
             "proleptic_gregorian" => Ok(Calendar::ProlepticGregorian),
             "no_leap" | "day365" => Ok(Calendar::NoLeap),
             "all_leap" | "day366" => Ok(Calendar::AllLeap),
