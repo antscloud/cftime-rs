@@ -299,15 +299,56 @@ impl PyCFDatetime {
     pub fn nanoseconds(&self) -> u32 {
         self.dt.nanoseconds()
     }
+    /// Change the calendar of the PyCFDateTime.
+    ///
+    /// # Arguments
+    ///
+    /// * `calendar` - The new calendar to be applied.
+    ///
+    /// # Returns
+    ///
+    /// A new instance of `Self` with the updated calendar.
+    pub fn change_calendar(&self, calendar: PyCFCalendar) -> PyResult<Self> {
+        let new_dt = self
+            .dt
+            .change_calendar(calendar.calendar)
+            .map_err(|e| PyValueError::new_err(e.to_string()))?;
+        Ok(Self { dt: new_dt.into() })
+    }
+
+    /// Changes the calendar of the DateTime based on the internal timestamp.
+    ///
+    /// # Arguments
+    ///
+    /// * `calendar` - The new calendar to use.
+    ///
+    /// # Returns
+    ///
+    /// A new PyCFDateTime object.
+    ///
+    /// # Errors
+    ///
+    /// Returns a PyValueError if an error occurs while changing the calendar.
+    pub fn change_calendar_from_timestamp(&self, calendar: PyCFCalendar) -> PyResult<Self> {
+        // Call the change_calendar_from_timestamp method on self.dt
+        let new_dt = self
+            .dt
+            .change_calendar_from_timestamp(calendar.calendar)
+            .map_err(|e| PyValueError::new_err(e.to_string()))?;
+
+        // Create a new DateTime object with the updated dt value
+        Ok(Self { dt: new_dt.into() })
+    }
     fn __repr__(&self) -> String {
         format!("PyCFDatetime({})", self.dt)
     }
     fn __str__(&self) -> String {
         self.dt.to_string()
     }
-    fn __sub__(&self, other: &PyCFDatetime) -> PyCFDuration {
-        let duration = &*self.dt - &*other.dt;
-        PyCFDuration { duration: duration }
+    fn __sub__(&self, other: &PyCFDatetime) -> PyResult<PyCFDuration> {
+        let duration =
+            (&*self.dt - &*other.dt).map_err(|e| PyValueError::new_err(e.to_string()))?;
+        Ok(PyCFDuration { duration: duration })
     }
     fn __add__(&self, other: &PyCFDuration) -> PyResult<PyCFDatetime> {
         let dt = (&*self.dt + &other.duration).map_err(|e| PyValueError::new_err(e.to_string()))?;

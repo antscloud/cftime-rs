@@ -245,7 +245,7 @@ class PyCFCalendar:
             PyCFCalendar: A PyCFCalendar object.
 
         Raises:
-            PyValueError: If the calendar string cannot be parsed.
+            ValueError: If the calendar string cannot be parsed.
         """
         ...
 
@@ -400,6 +400,41 @@ class PyCFDatetime:
             PyCFDatetime: A new PyCFDatetime object.
         """
         ...
+    def change_calendar(self, calendar: PyCFCalendar) -> "PyCFDatetime":
+        """Change the calendar of the PyCFDatetime.
+
+        This can be considered as safe as this method try to recreate the datetime with the same year, month,
+        day, hour, minute, second and nanoseconds.
+
+        Args:
+            calendar (PyCFCalendar): The calendar for the datetime.
+
+        Returns:
+            PyCFDatetime: A new PyCFDatetime object.
+
+        Raises:
+            ValueError: If the date is not possible in the target calendar.
+        """
+        ...
+    def change_calendar_from_timestamp(
+        self,
+        calendar: PyCFCalendar,
+    ) -> "PyCFDatetime":
+        """Change the calendar of the CFDatetime using the timestamp
+
+        Be aware that there is highly chance that the two dates do not correspond.
+        However their distances from epoch are the same.
+
+                Args:
+            calendar (PyCFCalendar): The calendar for the datetime.
+
+        Returns:
+            PyCFDatetime: A new PyCFDatetime object.
+
+        Raises:
+            ValueError: If the date is not possible in the target calendar.
+        """
+    ...
 
 def num2date(
     arr: Iterable[Union[int, float]],
