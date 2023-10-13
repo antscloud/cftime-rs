@@ -1,6 +1,25 @@
 # flake8: noqa
 
 from typing import Iterable, Union, List, Tuple
+import datetime as dt
+
+class PyCFCalendar:
+    """PyCFCalendar represents a calendar object."""
+
+    @staticmethod
+    def from_str(s: str) -> "PyCFCalendar":
+        """Create a PyCFCalendar from a string representation.
+
+        Args:
+            s (str): The string representation of the calendar.
+
+        Returns:
+            PyCFCalendar: A PyCFCalendar object.
+
+        Raises:
+            ValueError: If the calendar string cannot be parsed.
+        """
+        ...
 
 class PyCFDuration:
     """PyCFDuration is a wrapper around Rust CFDuration.
@@ -13,7 +32,7 @@ class PyCFDuration:
     """
 
     @classmethod
-    def from_years(cls, years: int, calendar: PyCFCalendar) -> PyCFDuration:
+    def from_years(cls, years: int, calendar: PyCFCalendar) -> "PyCFDuration":
         """
         Makes a new PyCFDuration with the given number of years and specific calendar.
 
@@ -26,7 +45,7 @@ class PyCFDuration:
         """
         ...
     @classmethod
-    def from_month(cls, month: int, calendar: PyCFCalendar) -> PyCFDuration:
+    def from_month(cls, month: int, calendar: PyCFCalendar) -> "PyCFDuration":
         """
         Makes a new PyCFDuration with the given number of month and specific calendar.
 
@@ -39,7 +58,7 @@ class PyCFDuration:
         """
         ...
     @classmethod
-    def from_weeks(cls, weeks: int, calendar: PyCFCalendar) -> PyCFDuration:
+    def from_weeks(cls, weeks: int, calendar: PyCFCalendar) -> "PyCFDuration":
         """
         Makes a new PyCFDuration with the given number of weeks and specific calendar.
 
@@ -52,7 +71,7 @@ class PyCFDuration:
         """
         ...
     @classmethod
-    def from_days(cls, days: int, calendar: PyCFCalendar) -> PyCFDuration:
+    def from_days(cls, days: int, calendar: PyCFCalendar) -> "PyCFDuration":
         """
         Makes a new PyCFDuration with the given number of days and specific calendar.
 
@@ -65,7 +84,7 @@ class PyCFDuration:
         """
         ...
     @classmethod
-    def from_hours(cls, hours: int, calendar: PyCFCalendar) -> PyCFDuration:
+    def from_hours(cls, hours: int, calendar: PyCFCalendar) -> "PyCFDuration":
         """
         Makes a new PyCFDuration with the given number of hours and specific calendar.
 
@@ -78,7 +97,7 @@ class PyCFDuration:
         """
         ...
     @classmethod
-    def from_minutes(cls, minutes: int, calendar: PyCFCalendar) -> PyCFDuration:
+    def from_minutes(cls, minutes: int, calendar: PyCFCalendar) -> "PyCFDuration":
         """
         Makes a new PyCFDuration with the given number of minutes and specific calendar.
 
@@ -91,7 +110,7 @@ class PyCFDuration:
         """
         ...
     @classmethod
-    def from_seconds(cls, seconds: int, calendar: PyCFCalendar) -> PyCFDuration:
+    def from_seconds(cls, seconds: int, calendar: PyCFCalendar) -> "PyCFDuration":
         """
         Makes a new PyCFDuration with the given number of seconds and specific calendar.
 
@@ -104,7 +123,7 @@ class PyCFDuration:
         """
         ...
     @classmethod
-    def from_milliseconds(cls, milliseconds: int, calendar: PyCFCalendar) -> PyCFDuration:
+    def from_milliseconds(cls, milliseconds: int, calendar: PyCFCalendar) -> "PyCFDuration":
         """
         Makes a new PyCFDuration with the given number of milliseconds and specific calendar.
 
@@ -117,7 +136,7 @@ class PyCFDuration:
         """
         ...
     @classmethod
-    def from_microseconds(cls, microseconds: int, calendar: PyCFCalendar) -> PyCFDuration:
+    def from_microseconds(cls, microseconds: int, calendar: PyCFCalendar) -> "PyCFDuration":
         """
         Makes a new PyCFDuration with the given number of microseconds and specific calendar.
 
@@ -130,7 +149,7 @@ class PyCFDuration:
         """
         ...
     @classmethod
-    def from_nanoseconds(cls, nanoseconds: int, calendar: PyCFCalendar) -> PyCFDuration:
+    def from_nanoseconds(cls, nanoseconds: int, calendar: PyCFCalendar) -> "PyCFDuration":
         """
         Makes a new PyCFDuration with the given number of nanoseconds and specific calendar.
 
@@ -156,14 +175,6 @@ class PyCFDuration:
 
         Returns:
             float: Number of months.
-        """
-        ...
-    def num_days(self) -> float:
-        """
-        Returns the total number of days in the duration.
-
-        Returns:
-            float: Number of days.
         """
         ...
     def num_weeks(self) -> float:
@@ -228,24 +239,6 @@ class PyCFDuration:
 
         Returns:
             float: Number of nanoseconds.
-        """
-        ...
-
-class PyCFCalendar:
-    """PyCFCalendar represents a calendar object."""
-
-    @staticmethod
-    def from_str(s: str) -> PyCFCalendar:
-        """Create a PyCFCalendar from a string representation.
-
-        Args:
-            s (str): The string representation of the calendar.
-
-        Returns:
-            PyCFCalendar: A PyCFCalendar object.
-
-        Raises:
-            ValueError: If the calendar string cannot be parsed.
         """
         ...
 
@@ -425,7 +418,7 @@ class PyCFDatetime:
         Be aware that there is highly chance that the two dates do not correspond.
         However their distances from epoch are the same.
 
-                Args:
+        Args:
             calendar (PyCFCalendar): The calendar for the datetime.
 
         Returns:
@@ -434,8 +427,7 @@ class PyCFDatetime:
         Raises:
             ValueError: If the date is not possible in the target calendar.
         """
-    ...
-
+        ...
     def to_pydatetime(self) -> dt.datetime:
         """
         Converts the object to a Python datetime object using year, month, day, hour, minute,
@@ -549,8 +541,6 @@ def date2num(
             List of numbers based on calendar, units, and dtype
     """
     ...
-
-import datetime as dt
 
 def pydate2num(
     datetimes: List[dt.datetime],
