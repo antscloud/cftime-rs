@@ -30,17 +30,17 @@
 </p>
 
 <p align="center">
-    <b>Documentation<b> :
+    <b>Documentation</b> :
     <a href="https://docs.rs/cftime-rs/latest/cftime_rs/">Rust</a>
     |
     <a href="https://cftime-rs.readthedocs.io/en/latest/">Python</a>
     <br>
-    <b>Packages<b> :
+    <b>Packages</b> :
     <a href="https://crates.io/crates/cftime-rs">Rust</a>
     |
     <a href="https://pypi.org/project/cftime-rs/">Python</a>
     <br>
-    <b>Repository<b> :
+    <b>Repository</b> :
     <a href="https://github.com/antscloud/cftime-rs">Github</a>
 </p>
 
