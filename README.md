@@ -1,6 +1,6 @@
 # `cftime-rs`
 
-`cftime-rs` is an implementation in `rust` of the [cf time](https://cfconventions.org/Data/cf-conventions/cf-conventions-1.10/cf-conventions.html#time-coordinate) convention. Python bindins are available for this project. 
+`cftime-rs` is an implementation in `rust` of the [cf time](https://cfconventions.org/Data/cf-conventions/cf-conventions-1.10/cf-conventions.html#time-coordinate) convention. Python bindins are available for this project and use the great [maturin library](https://www.maturin.rs/). The python bindings are highly inspired by the [cftime](https://github.com/Unidata/cftime/tree/master) python package developped by [Unidata](https://github.com/Unidata). 
 
 <p align="center">
     <a href="https://github.com/antscloud/cftime-rs/actions">
@@ -259,9 +259,13 @@ Here is an example of the computation of 1_000_000_000_000_000 seconds using the
 
 ## Comparison with cftime
 
-Here is a benchmark on my computer of two methods. This is not really rigorous but this is to give an idea.  
+Here is a benchmark on my computer of three methods. This is not really rigorous but this is to give an idea.  
 
-We are comparing cftime with cftime_rs. The first method involves decoding a series of numbers using the standard calendar, calling the .str() method, and then re-encoding them to the same unit and calendar. The second method is to decode a series of numbers using the standard calendar and re-encode them to the same unit and calendar without calling .str(). Both methods are designed to be fair between the two libraries because cftime_rs only uses timestamps (i64) as its internal representation and never recalculates the year, month, day, hour, minutes, and seconds, except if you explicitly request this representation.
+We are comparing cftime with cftime_rs. The first method involves decoding a series of numbers using the standard calendar, calling the .str() method, and then re-encoding them to the same unit and calendar. 
+The second method is to decode a series of numbers using the standard calendar and re-encode them to the same unit and calendar without calling .str().
+The third method is to decode a series of numbers using the standard calendar into python datetimes and re-encode them to the same unit and calendar without calling .str(). 
+
+First and second methods are designed to be fair between the two libraries because cftime_rs only uses timestamps (i64) as its internal representation and never recalculates the year, month, day, hour, minutes, and seconds, except if you explicitly request this representation.
 
 
 <div style="display: flex; align-items: center; justify-content: center">
@@ -269,3 +273,6 @@ We are comparing cftime with cftime_rs. The first method involves decoding a ser
     <img src="./benchmark/performance_comparison_without_str.png" alt="Second method" width="45%">
 </div>
 
+<div style="display: flex; align-items: center; justify-content: center">
+    <img src="./benchmark/performance_comparison_pydatetime_without_str.png" alt="First method" width="45%">
+</div>

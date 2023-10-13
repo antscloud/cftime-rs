@@ -90,6 +90,7 @@ def cftime_benchmark(arr: np.array) -> float:
 def get_data_with_str() -> Tuple[List[float], List[float]]:
     cftime_rs_times = []
     cftime_times = []
+    print("cftime_rs_benchmark_with_str")
     for n in ITERATIONS:
         print(f"Number of Iterations with str: {n}")
         arr = np.array(range(n))
@@ -98,6 +99,8 @@ def get_data_with_str() -> Tuple[List[float], List[float]]:
         cftime_rs_times.append(cftime_rs_duration)
         cftime_duration = cftime_benchmark(arr)
         cftime_times.append(cftime_duration)
+        print(f"cftime_rs : {cftime_rs_duration:.4f} seconds")
+        print(f"cftime    : {cftime_duration:.4f} seconds")
     return cftime_rs_times, cftime_times
 
 
@@ -121,6 +124,7 @@ def get_data_without_str() -> Tuple[List[float], List[float]]:
     cftime_rs_times = []
     cftime_times = []
     for n in ITERATIONS:
+        print("cftime_rs_benchmark_without_str")
         print(f"Number of Iterations with str: {n}")
         arr = np.array(range(n))
 
@@ -128,6 +132,8 @@ def get_data_without_str() -> Tuple[List[float], List[float]]:
         cftime_rs_times.append(cftime_rs_duration)
         cftime_duration = cftime_benchmark_without_str(arr)
         cftime_times.append(cftime_duration)
+        print(f"cftime_rs : {cftime_rs_duration:.4f} seconds")
+        print(f"cftime    : {cftime_duration:.4f} seconds")
     return cftime_rs_times, cftime_times
 
 
@@ -150,6 +156,7 @@ def cftime_benchmark_pydatetime_without_str(arr: np.array) -> float:
 def get_data_pydatetime_without_str() -> Tuple[List[float], List[float]]:
     cftime_rs_times = []
     cftime_times = []
+    print("cftime_rs_benchmark_pydatetime_without_str")
     for n in ITERATIONS:
         print(f"Number of Iterations with str: {n}")
         arr = np.array(range(n))
@@ -158,6 +165,8 @@ def get_data_pydatetime_without_str() -> Tuple[List[float], List[float]]:
         cftime_rs_times.append(cftime_rs_duration)
         cftime_duration = cftime_benchmark_without_str(arr)
         cftime_times.append(cftime_duration)
+        print(f"cftime_rs : {cftime_rs_duration:.4f} seconds")
+        print(f"cftime    : {cftime_duration:.4f} seconds")
     return cftime_rs_times, cftime_times
 
 
@@ -166,20 +175,20 @@ if __name__ == "__main__":
     performance_comparison_chart(
         cftime_rs_times,
         cftime_times,
-        title="Performance Comparison: cftime_rs vs. cftime. Encoding, calling __str__ and encoding. \nLower is better",
+        title="Performance Comparison: cftime_rs vs. cftime.\nEncoding, calling __str__ and encoding. \nLower is better",
         output_file="performance_comparison_with_str.png",
     )
     cftime_rs_times, cftime_times = get_data_without_str()
     performance_comparison_chart(
         cftime_rs_times,
         cftime_times,
-        title="Performance Comparison: cftime_rs vs. cftime. Encoding and encoding. \nLower is better",
+        title="Performance Comparison: cftime_rs vs. cftime./nEncoding and encoding. \nLower is better",
         output_file="performance_comparison_without_str.png",
     )
     cftime_rs_times, cftime_times = get_data_pydatetime_without_str()
     performance_comparison_chart(
         cftime_rs_times,
         cftime_times,
-        title="Performance Comparison: cftime_rs vs. cftime. Encoding and encoding by using python datetime \nLower is better",
+        title="Performance Comparison: cftime_rs vs. cftime.\nEncoding and encoding by using python datetime \nLower is better",
         output_file="performance_comparison_pydatetime_without_str.png",
     )
