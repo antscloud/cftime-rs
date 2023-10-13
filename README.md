@@ -1,3 +1,7 @@
+# `cftime-rs`
+
+`cftime-rs` is an implementation in `rust` of the [cf time](https://cfconventions.org/Data/cf-conventions/cf-conventions-1.10/cf-conventions.html#time-coordinate) convention. Python bindins are available for this project. 
+
 <p align="center">
     <a href="https://github.com/antscloud/cftime-rs/actions">
         <img alt="CI Status" src="https://github.com/antscloud/cftime-rs/actions/workflows/ci.yaml/badge.svg?branch=main">
@@ -40,9 +44,6 @@
     <a href="https://github.com/antscloud/cftime-rs">Github</a>
 </p>
 
-# `cftime-rs`
-
-`cftime-rs` is an implementation in `rust` of the [cf time](https://cfconventions.org/Data/cf-conventions/cf-conventions-1.10/cf-conventions.html#time-coordinate) convention. Python bindins are available for this project. 
 
 
 ## Rust
