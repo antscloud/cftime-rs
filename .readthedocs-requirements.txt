@@ -1,6 +1,6 @@
 # Documentation for RTD 
-"sphinx>=4.5.0",
-"sphinx-autoapi",
-"myst",
-"myst-parser",
-"sphinx_book_theme>=0.3.0",
+sphinx>=4.5.0
+sphinx-autoapi
+myst
+myst-parser
+sphinx_book_theme>=0.3.0
