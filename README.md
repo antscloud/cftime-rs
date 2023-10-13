@@ -1,6 +1,12 @@
 <p align="center">
+    <a href="https://github.com/antscloud/cftime-rs/actions">
+        <img alt="CI Status" src="https://github.com/antscloud/cftime-rs/actions/workflows/ci.yaml/badge.svg?branch=main">
+    </a>
     <a href="https://crates.io/crates/cftime-rs">
         <img src="https://img.shields.io/crates/v/cftime-rs.svg" alt="Crates.io version badge">
+    </a>
+    <a href="https://pypi.org/project/cftime-rs/">
+        <img src="https://img.shields.io/pypi/v/cftime-rs.svg" alt="Pypi version badge">
     </a>
     <a href="https://github.com/antscloud/cftime-rs/actions">
         <img src="https://github.com/antscloud/cftime-rs/actions/workflows/ci.yaml/badge.svg" alt="CI/CD Status">
@@ -8,17 +14,30 @@
     <a href="https://www.gnu.org/licenses/agpl-3.0">
         <img src="https://img.shields.io/badge/License-AGPL_v3-blue.svg" alt="License: AGPL v3">
     </a>
-        <a href="https://pypi.org/project/cftime-rs/">
-        <img src="https://img.shields.io/pypi/v/cftime-rs.svg" alt="Pypi version badge">
+    <a href="https://cftime-rs.readthedocs.io/en/latest">
+        <img alt="Documentation Status" src="https://readthedocs.org/projects/cftime-rs/badge/?version=latest">
+    </a>
+    <a href="https://github.com/antscloud/cftime-rs/issues">
+        <img alt="Issue Badge" src="https://img.shields.io/github/issues/antscloud/cftime-rs">
+    </a>
+    <a href="https://github.com/antscloud/cftime-rs/pulls">
+        <img alt="Pull requests Badge" src="https://img.shields.io/github/issues-pr/antscloud/cftime-rs">
     </a>
 </p>
 
 <p align="center">
-    <a href="https://docs.rs/cftime-rs/0.1.0/cftime_rs/index.html">Documentation</a>
+    <b>Documentation<b> :
+    <a href="https://docs.rs/cftime-rs/latest/cftime_rs/">Rust</a>
     |
-    <a href="https://crates.io/crates/cftime-rs">Crate</a>
+    <a href="https://cftime-rs.readthedocs.io/en/latest/">Python</a>
+    <br>
+    <b>Packages<b> :
+    <a href="https://crates.io/crates/cftime-rs">Rust</a>
     |
-    <a href="https://github.com/antscloud/cftime-rs">Repo</a>
+    <a href="https://pypi.org/project/cftime-rs/">Python</a>
+    <br>
+    <b>Repository<b> :
+    <a href="https://github.com/antscloud/cftime-rs">Github</a>
 </p>
 
 # `cftime-rs`
