@@ -12,6 +12,24 @@ classifiers = [
 ]
 dynamic = ["version"]
 
+[project.optional-dependencies]
+dev = [
+    "cftime-rs",
+    # Pytest
+    "pytest>=6.1.1",
+    "pytest-cov>=2.10.1",
+    "pytest-mock>=3.6.1",
+    "coverage>=5.3",
+
+    # Documentation
+    "sphinx>=4.5.0",
+    "sphinx-autoapi",
+    "myst",
+    "myst-parser",
+    "sphinx_book_theme>=0.3.0",
+
+]
+
 [tool.maturin]
 module-name = "cftime_rs"
 python-source = "python"
