@@ -175,20 +175,20 @@ if __name__ == "__main__":
     performance_comparison_chart(
         cftime_rs_times,
         cftime_times,
-        title="Performance Comparison: cftime_rs vs. cftime.\nEncoding, calling __str__ and encoding. \nLower is better",
+        title="Performance Comparison: cftime_rs vs. cftime.\nDecoding, calling __str__ and encoding. \nLower is better",
         output_file="performance_comparison_with_str.png",
     )
     cftime_rs_times, cftime_times = get_data_without_str()
     performance_comparison_chart(
         cftime_rs_times,
         cftime_times,
-        title="Performance Comparison: cftime_rs vs. cftime./nEncoding and encoding. \nLower is better",
+        title="Performance Comparison: cftime_rs vs. cftime./Decoding and encoding. \nLower is better",
         output_file="performance_comparison_without_str.png",
     )
     cftime_rs_times, cftime_times = get_data_pydatetime_without_str()
     performance_comparison_chart(
         cftime_rs_times,
         cftime_times,
-        title="Performance Comparison: cftime_rs vs. cftime.\nEncoding and encoding by using python datetime \nLower is better",
+        title="Performance Comparison: cftime_rs vs. cftime.\nDecoding and encoding by using python datetime \nLower is better",
         output_file="performance_comparison_pydatetime_without_str.png",
     )
