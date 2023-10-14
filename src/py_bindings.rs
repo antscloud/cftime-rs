@@ -403,7 +403,7 @@ macro_rules! decode_numbers {
                 let supported_types = stringify!($($t),+);
                 return Err(PyValueError::new_err(format!(
                 "Could not convert array to supported types. \
-                `num2date` function needs an array of one the following types: {}",supported_types)))
+                Needs an one-dimensional array of one the following types: {}",supported_types)))
             }
         }
     };
@@ -427,20 +427,10 @@ fn num2pydate<'a>(
     units: String,
     calendar: String,
 ) -> PyResult<Vec<&'a PyDateTime>> {
-    let calendar = Calendar::from_str(calendar.as_str())
-        .map_err(|e| PyValueError::new_err(format!("Could not parse calendar: {}", e)))?;
-    let datetimes = decode_numbers!(numbers, units, calendar, i32, i64, f32, f64);
-
-    let mut pydatetimes = Vec::with_capacity(datetimes.len());
-    for dt in datetimes {
-        let py_dt = PyDateTime::from_timestamp(
-            py,
-            dt.timestamp() as f64 + dt.nanoseconds() as f64 / 1e9,
-            None,
-        )?;
-        pydatetimes.push(py_dt);
-    }
-    Ok(pydatetimes)
+    Ok(num2date(numbers, units, calendar)?
+        .iter()
+        .map(|dt| dt.to_pydatetime(py))
+        .collect::<Result<Vec<_>, _>>()?)
 }
 enum DType {
     Int32,
