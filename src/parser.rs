@@ -44,7 +44,9 @@ pub struct ParsedCFTime {
     pub datetime: ParsedDatetime,
 }
 pub fn parse_cf_time(unit: &str) -> Result<ParsedCFTime, crate::errors::Error> {
-    let matches: Vec<&str> = unit.split(' ').collect();
+    let mut matches: Vec<&str> = unit.split(' ').collect();
+    // Remove empty strings
+    matches.retain(|&s| !s.trim().is_empty());
     if matches.len() < 3 {
         return Err(crate::errors::Error::UnitParserError(unit.to_string()));
     }
