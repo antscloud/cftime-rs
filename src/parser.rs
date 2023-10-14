@@ -118,13 +118,20 @@ pub fn parse_cf_time(unit: &str) -> Result<ParsedCFTime, crate::errors::Error> {
     }
 
     let tz: Vec<&str> = matches[4].split(':').collect();
-    if tz.len() != 2 {
+    if tz.len() > 2 || tz.len() <= 0 {
         return Err(crate::errors::Error::UnitParserError(
             format!("Invalid time zone: {unit}").to_string(),
         ));
     }
-    let tzhour = tz[0].parse::<i8>()?;
-    let tzminute = tz[1].parse::<u8>()?;
+    let mut tzhour = 0;
+    let mut tzminute = 0;
+    if tz.len() == 1 {
+        tzhour = tz[0].parse::<i8>()?;
+        tzminute = 0;
+    } else if tz.len() == 2 {
+        tzhour = tz[0].parse::<i8>()?;
+        tzminute = tz[1].parse::<u8>()?;
+    }
     Ok(ParsedCFTime {
         unit: duration_unit,
         datetime: ParsedDatetime {
