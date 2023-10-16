@@ -413,7 +413,11 @@ macro_rules! decode_numbers {
 fn num2date(numbers: &PyAny, units: String, calendar: String) -> PyResult<Vec<PyCFDatetime>> {
     let calendar = Calendar::from_str(calendar.as_str())
         .map_err(|e| PyValueError::new_err(format!("Could not parse calendar: {}", e)))?;
-    let datetimes = decode_numbers!(numbers, units, calendar, i32, i64, f32, f64);
+    // The order is important always prefer a bigger representation such as i64 or f64 to a
+    // smaller representation such as i32 or f32
+    // This is because if we convert some number coming from python we can downcast from f64 to f32
+    // and lose precision
+    let datetimes = decode_numbers!(numbers, units, calendar, i64, i32, f64, f32);
     Ok(datetimes
         .into_iter()
         .map(|dt| PyCFDatetime { dt: dt.into() })

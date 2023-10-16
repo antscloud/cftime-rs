@@ -123,4 +123,15 @@ mod tests {
             .unwrap();
         assert_eq!(result, vec![0, 86400, 172800]);
     }
+    #[test]
+    fn test_vec_encode_cf_days() {
+        let units = "days since 0000-01-01 00:00:00";
+        let datetimes = vec![
+            CFDatetime::from_ymd_hms(2000, 1, 1, 0, 0, 0.0, Calendar::Standard).unwrap(),
+            CFDatetime::from_ymd_hms(2000, 1, 2, 1, 0, 0.0, Calendar::Standard).unwrap(),
+            CFDatetime::from_ymd_hms(2000, 1, 3, 2, 0, 0.0, Calendar::Standard).unwrap(),
+        ];
+        let result: Vec<f64> = datetimes.encode_cf(units, Calendar::Standard).unwrap();
+        assert_eq!(result, vec![730487.0, 730488.0416666666, 730489.0833333334]);
+    }
 }

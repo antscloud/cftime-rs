@@ -215,5 +215,39 @@ mod tests {
             (2232, 4, 12, 0, 0, 0)
         );
     }
+    #[test]
+    fn test_vec_decode_cf_days() {
+        /// Inverse function of test_vec_encode_cf_days
+        let units = "days since 0000-01-01 00:00:00";
+        // Tests with f64
+        let numbers = vec![730487.0, 730488.0416666666, 730489.0833333334];
+        let result = numbers.decode_cf(units, Calendar::Standard).unwrap();
+        let datetimes = vec![
+            CFDatetime::from_ymd_hms(2000, 1, 1, 0, 0, 0.0, Calendar::Standard).unwrap(),
+            CFDatetime::from_ymd_hms(2000, 1, 2, 1, 0, 0.0, Calendar::Standard).unwrap(),
+            CFDatetime::from_ymd_hms(2000, 1, 3, 2, 0, 0.0, Calendar::Standard).unwrap(),
+        ];
+        for (i, datetime) in datetimes.iter().enumerate() {
+            let expected_ymd_hms = datetime.ymd_hms().unwrap();
+            let result_ymd_hms = result[i].ymd_hms().unwrap();
+            assert_eq!(expected_ymd_hms, result_ymd_hms);
+        }
+
+        // Tests with f32 that can't work
+        // 730488.0416666666 can't be represented in f32 better than 730488.0625
+        let units = "days since 0000-01-01 00:00:00";
+        let numbers: Vec<f32> = vec![730487.0, 730488.0416666666, 730489.0833333334];
+        let result = numbers.decode_cf(units, Calendar::Standard).unwrap();
+        let datetimes = vec![
+            CFDatetime::from_ymd_hms(2000, 1, 1, 0, 0, 0.0, Calendar::Standard).unwrap(),
+            CFDatetime::from_ymd_hms(2000, 1, 2, 1, 0, 0.0, Calendar::Standard).unwrap(),
+            CFDatetime::from_ymd_hms(2000, 1, 3, 2, 0, 0.0, Calendar::Standard).unwrap(),
+        ];
+        for (i, datetime) in datetimes.iter().enumerate() {
+            let expected_ymd_hms = datetime.ymd_hms().unwrap();
+            let result_ymd_hms = result[i].ymd_hms().unwrap();
+            assert_ne!(expected_ymd_hms, result_ymd_hms);
+        }
+    }
     // Add more test cases for other scenarios as needed
 }

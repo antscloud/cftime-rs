@@ -61,7 +61,7 @@ def test_num2pydate():
     assert result == expected
 
 
-def test_float():
+def test_num2date_for_float():
     arr = [95795.0]
     units = "days since 1970-01-01"
     calendar = "standard"
@@ -71,3 +71,17 @@ def test_float():
     ]
     result = cftime_rs.num2date(arr, units, calendar)
     assert [i.ymd_hms() for i in result] == [i.ymd_hms() for i in expected]
+
+
+def test_idempotence_of_num2pydate_then_pydate2num_for_float():
+    dts = [
+        dt.datetime(2000, 1, 1, 0, 0, 0),
+        dt.datetime(2000, 1, 2, 1, 0, 0),
+        dt.datetime(2000, 1, 3, 2, 0, 0),
+    ]
+    units = "days since 0000-01-01 00:00:00"
+    calendar = "standard"
+    encoded_numbers = cftime_rs.pydate2num(dts, units, calendar, dtype="f64")
+
+    result = cftime_rs.num2pydate(encoded_numbers, units, calendar)
+    assert result == dts
