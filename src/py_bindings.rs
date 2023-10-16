@@ -360,7 +360,7 @@ impl PyCFDatetime {
             None,
         )
     }
-    fn to_pydatetime_with_timestamp<'a>(&self, py: Python<'a>) -> PyResult<&'a PyDateTime> {
+    fn to_pydatetime_from_timestamp<'a>(&self, py: Python<'a>) -> PyResult<&'a PyDateTime> {
         PyDateTime::from_timestamp(
             py,
             self.dt.timestamp() as f64 + self.dt.nanoseconds() as f64 / 1e9,
@@ -421,16 +421,24 @@ fn num2date(numbers: &PyAny, units: String, calendar: String) -> PyResult<Vec<Py
 }
 
 #[pyfunction]
+#[pyo3(signature = (numbers, units, calendar, from_timestamp=false))]
 fn num2pydate<'a>(
     py: Python<'a>,
     numbers: &'a PyAny,
     units: String,
     calendar: String,
+    from_timestamp: Option<bool>,
 ) -> PyResult<Vec<&'a PyDateTime>> {
-    Ok(num2date(numbers, units, calendar)?
-        .iter()
-        .map(|dt| dt.to_pydatetime(py))
-        .collect::<Result<Vec<_>, _>>()?)
+    match from_timestamp {
+        Some(true) => num2date(numbers, units, calendar)?
+            .iter()
+            .map(|dt| dt.to_pydatetime_from_timestamp(py))
+            .collect::<Result<Vec<_>, _>>(),
+        _ => num2date(numbers, units, calendar)?
+            .iter()
+            .map(|dt| dt.to_pydatetime(py))
+            .collect::<Result<Vec<_>, _>>(),
+    }
 }
 enum DType {
     Int32,

@@ -123,7 +123,9 @@ class PyCFDuration:
         """
         ...
     @classmethod
-    def from_milliseconds(cls, milliseconds: int, calendar: PyCFCalendar) -> "PyCFDuration":
+    def from_milliseconds(
+        cls, milliseconds: int, calendar: PyCFCalendar
+    ) -> "PyCFDuration":
         """
         Makes a new PyCFDuration with the given number of milliseconds and specific calendar.
 
@@ -136,7 +138,9 @@ class PyCFDuration:
         """
         ...
     @classmethod
-    def from_microseconds(cls, microseconds: int, calendar: PyCFCalendar) -> "PyCFDuration":
+    def from_microseconds(
+        cls, microseconds: int, calendar: PyCFCalendar
+    ) -> "PyCFDuration":
         """
         Makes a new PyCFDuration with the given number of microseconds and specific calendar.
 
@@ -149,7 +153,9 @@ class PyCFDuration:
         """
         ...
     @classmethod
-    def from_nanoseconds(cls, nanoseconds: int, calendar: PyCFCalendar) -> "PyCFDuration":
+    def from_nanoseconds(
+        cls, nanoseconds: int, calendar: PyCFCalendar
+    ) -> "PyCFDuration":
         """
         Makes a new PyCFDuration with the given number of nanoseconds and specific calendar.
 
@@ -440,7 +446,7 @@ class PyCFDatetime:
             ValueError: If the date cannot be converted to a datetime
         """
         ...
-    def to_pydatetime_with_timestamp(self) -> dt.datetime:
+    def to_pydatetime_from_timestamp(self) -> dt.datetime:
         """
         Converts the object to a Python datetime object using the timestamp
 
@@ -484,6 +490,7 @@ def num2pydate(
     arr: Iterable[Union[int, float]],
     units: str,
     calendar: str,
+    from_timestamp: bool = False,
 ) -> List[dt.datetime]:
     """Convert a list of numbers to datetime objects based on the specified calendar.
 
@@ -496,6 +503,12 @@ def num2pydate(
             CF calendar name. Should be one of "standard", "gregorian",
             "proleptic_gregorian", "julian", "all_leap", "no_leap", "360_day", "365_day", "366_day".
             If the calendar is not recognized, "standard" will be used
+        from_timestamp : bool
+            If True, the date will be converted using timestamp value from epoch and python datetime
+            `.from_timestamp` method will be used. This method guarantee that the date is valid if no
+            overflow occurs. While the distance from epoch is the same, the date are likely to be different.
+            If False, the date will be converted using python datetime constructor method : the year, month, day, hour, minute, second and nanoseconds will be extyracted from PyCFDatetime object and given back to python datetime constructor. There is no guarantee that the date is valid in the calendar. This method is also considerably slower than using the timestamp.
+            Default value is False.
 
     Raises:
         ValueError
