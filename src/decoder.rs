@@ -175,5 +175,45 @@ mod tests {
             (2000, 1, 1, 2, 0, 0)
         );
     }
+    #[test]
+    fn test_decode_95795_from_days() {
+        // This error originates from Python bindings
+        // From 95795.0 it gives (2232, 4, 11, 23, 57, 52) instead of (2232, 4, 12, 0, 0, 0)
+        // But this worked for int
+        let to_decode: Vec<f32> = vec![95795.0];
+        let units = "days since 1970-01-01";
+        let calendar = Calendar::Standard;
+
+        let datetimes_result = to_decode.decode_cf(units, calendar);
+        let datetimes = datetimes_result.unwrap();
+        let (year, month, day, hour, minute, second) = datetimes[0].ymd_hms().unwrap();
+        assert_eq!(
+            (year, month, day, hour, minute, second),
+            (2232, 4, 12, 0, 0, 0)
+        );
+
+        let to_decode: Vec<f64> = vec![95795.0];
+        let units = "days since 1970-01-01";
+        let calendar = Calendar::Standard;
+
+        let datetimes_result = to_decode.decode_cf(units, calendar);
+        let datetimes = datetimes_result.unwrap();
+        let (year, month, day, hour, minute, second) = datetimes[0].ymd_hms().unwrap();
+        assert_eq!(
+            (year, month, day, hour, minute, second),
+            (2232, 4, 12, 0, 0, 0)
+        );
+        let to_decode: Vec<i64> = vec![95795];
+        let units = "days since 1970-01-01";
+        let calendar = Calendar::Standard;
+
+        let datetimes_result = to_decode.decode_cf(units, calendar);
+        let datetimes = datetimes_result.unwrap();
+        let (year, month, day, hour, minute, second) = datetimes[0].ymd_hms().unwrap();
+        assert_eq!(
+            (year, month, day, hour, minute, second),
+            (2232, 4, 12, 0, 0, 0)
+        );
+    }
     // Add more test cases for other scenarios as needed
 }

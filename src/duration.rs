@@ -238,8 +238,11 @@ macro_rules! impl_mul_for_cf_duration_float {
             type Output = CFDuration;
             fn mul(self, rhs: $rhs_type) -> Self::Output {
                 // Classic (a+b)(d+c)
-                let mut new_seconds = (self.seconds as $rhs_type * rhs) as i64;
-                let mut new_ns = (self.nanoseconds as $rhs_type * rhs) as i64;
+                // f32 to i64 does not give the same result all the time
+                // i.e. 8276688000.0 gives 8276687872
+                let _rhs: f64 = rhs.into();
+                let mut new_seconds = (self.seconds as f64 * _rhs) as i64;
+                let mut new_ns = (self.nanoseconds as f64 * _rhs) as i64;
                 let (remaining_seconds, remaining_nanoseconds) = normalize_nanoseconds(new_ns);
                 new_seconds += remaining_seconds;
                 new_ns += remaining_nanoseconds as i64;
