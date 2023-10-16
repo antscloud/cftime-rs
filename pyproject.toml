@@ -15,6 +15,7 @@ dynamic = ["version"]
 [project.optional-dependencies]
 dev = [
     "cftime-rs",
+
     # Pytest
     "pytest>=6.1.1",
     "pytest-cov>=2.10.1",
@@ -27,7 +28,6 @@ dev = [
     "myst",
     "myst-parser",
     "sphinx_book_theme>=0.3.0",
-
 ]
 
 [tool.maturin]
