@@ -64,7 +64,7 @@ pub fn parse_cf_time(unit: &str) -> Result<ParsedCFTime, crate::errors::Error> {
         "microseconds" | "microsecond" | "microsecs" | "microsec" => Unit::Microsecond,
         _ => {
             return Err(crate::errors::Error::UnitParserError(
-                format!("Invalid duration unit: {unit}").to_string(),
+                format!("Invalid duration unit '{}' in '{unit}'", matches[0]).to_string(),
             ))
         }
     };
@@ -100,7 +100,7 @@ pub fn parse_cf_time(unit: &str) -> Result<ParsedCFTime, crate::errors::Error> {
     let time: Vec<&str> = matches[3].split(':').collect();
     if time.len() != 3 {
         return Err(crate::errors::Error::UnitParserError(
-            format!("Invalid time: {unit}").to_string(),
+            format!("Invalid time '{}' in '{unit}'", matches[3]).to_string(),
         ));
     }
     let hour = time[0].parse::<u8>()?;
@@ -122,7 +122,7 @@ pub fn parse_cf_time(unit: &str) -> Result<ParsedCFTime, crate::errors::Error> {
     let tz: Vec<&str> = matches[4].split(':').collect();
     if tz.len() > 2 || tz.len() <= 0 {
         return Err(crate::errors::Error::UnitParserError(
-            format!("Invalid time zone: {unit}").to_string(),
+            format!("Invalid time '{}' in '{unit}'", matches[4]).to_string(),
         ));
     }
     let mut tzhour = 0;
