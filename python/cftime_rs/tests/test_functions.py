@@ -103,3 +103,20 @@ def test_float_issue_impl_xarray():
     result = cftime_rs.num2pydate(time, units, calendar=calendar)
 
     assert times == result
+
+
+def test_360_day_issue_impl_xarray():
+    units = "days since 0001-01-01"
+    times = [
+        dt.datetime(1, 4, 1),
+        dt.datetime(1, 4, 2),
+        dt.datetime(1, 4, 3),
+        dt.datetime(1, 4, 4),
+        dt.datetime(1, 4, 5),
+        dt.datetime(1, 4, 6),
+    ]
+    encoded_time = cftime_rs.pydate2num(times, units, calendar="360_day", dtype="i64")
+    assert encoded_time == [90, 91, 92, 93, 94, 95]
+
+    decoded_time = cftime_rs.num2pydate(encoded_time, units, calendar="360_day")
+    assert decoded_time == times

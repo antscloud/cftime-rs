@@ -43,9 +43,10 @@ impl CalendarDatetime for Day360Datetime {
         if remaining_seconds < 0 {
             nb_days -= 1
         }
-        let (nb_year, nb_month_days) = (nb_days / 360, nb_days % 360);
+        let (nb_year, remaining_days) = (nb_days.div_euclid(360), nb_days.rem_euclid(360));
 
-        let (month, day) = (nb_month_days / 30, nb_month_days % 30);
+        let (mut month, day) = (remaining_days / 30, remaining_days % 30);
+        month = (month + 12) % 12;
         let year = constants::UNIX_DEFAULT_YEAR + nb_year;
         let (hour, minute, second) = get_hms_from_timestamp(remaining_seconds);
         Ok((
