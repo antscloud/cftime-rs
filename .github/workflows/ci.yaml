@@ -33,7 +33,7 @@ jobs:
       - name: Check out code
         uses: actions/checkout@v3
       - name: Build docker image
-        run: docker build -t cftime_rs . --progress=plain --file ./ci/python_test/Dockerfile
+        run: docker build -t cftime_rs . --file ./ci/python_test/Dockerfile
       - name: Run python tests
         run: docker run cftime_rs:latest
 
