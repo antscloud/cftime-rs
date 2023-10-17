@@ -188,7 +188,7 @@ impl PyCFDuration {
 /// All the methods depends on the Calendar definitions found in
 /// [udunits package](https://github.com/nco/nco/blob/master/data/udunits.dat)
 #[pyclass]
-#[derive(Clone)]
+#[derive(Clone, PartialEq)]
 pub struct PyCFDatetime {
     pub dt: Arc<CFDatetime>,
 }
@@ -368,7 +368,7 @@ impl PyCFDatetime {
         )
     }
     fn __repr__(&self) -> String {
-        format!("PyCFDatetime({})", self.dt)
+        format!("PyCFDatetime({}, {})", self.dt, self.dt.calendar())
     }
     fn __str__(&self) -> String {
         self.dt.to_string()
@@ -381,6 +381,9 @@ impl PyCFDatetime {
     fn __add__(&self, other: &PyCFDuration) -> PyResult<PyCFDatetime> {
         let dt = (&*self.dt + &other.duration).map_err(|e| PyValueError::new_err(e.to_string()))?;
         Ok(PyCFDatetime { dt: dt.into() })
+    }
+    fn __eq__(&self, other: &PyCFDatetime) -> PyResult<bool> {
+        Ok(self.dt == other.dt)
     }
 }
 
@@ -396,7 +399,7 @@ macro_rules! decode_numbers {
             $(
                 if let Ok(numbers) = $numbers.extract::<Vec<$t>>() {
                     numbers.decode_cf($units.as_str(), $calendar)
-                        .map_err(|e| PyValueError::new_err(format!("Could not decode numbers: {}", e)))?
+                        .map_err(|e| PyValueError::new_err(format!("Could not decode numbers {} into PyCFDatetime: {}", $numbers, e)))?
                 } else
             )+
             {

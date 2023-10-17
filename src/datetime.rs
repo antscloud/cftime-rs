@@ -38,6 +38,7 @@ use crate::{calendars::Calendar, constants};
 /// let duration = cf_datetime_2 - cf_datetime_1;
 /// assert_eq!(duration.num_days, 1);
 /// ```
+///
 pub struct CFDatetime {
     inner: Box<dyn CalendarDatetime + Send + Sync>,
 }
@@ -265,6 +266,13 @@ impl CFDatetime {
     }
 }
 
+impl PartialEq for CFDatetime {
+    fn eq(&self, other: &Self) -> bool {
+        self.calendar() == other.calendar()
+            && self.timestamp() == other.timestamp()
+            && self.nanoseconds() == other.nanoseconds()
+    }
+}
 /// Display a CFDatetime with the following format : `YYYY-MM-DD HH:MM:SS.SSS`
 impl std::fmt::Display for CFDatetime {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
@@ -274,7 +282,7 @@ impl std::fmt::Display for CFDatetime {
                 write!(
                     f,
                     "{:04}-{:02}-{:02} {:02}:{:02}:{:02}.{:03}",
-                    year, month, day, hour, minute, second, nanoseconds
+                    year, month, day, hour, minute, second, nanoseconds,
                 )
             }
             Err(err) => {
@@ -484,6 +492,22 @@ mod tests {
         for (timestamp, expected) in timestamp_expected {
             let datetime = CFDatetime::from_timestamp(timestamp, 0, calendars::Calendar::Standard);
             assert_eq!(datetime.unwrap().ymd_hms().unwrap(), expected);
+        }
+    }
+
+    #[test]
+    fn test_360_day_from_timestamp() {
+        let timestamp_expected: Vec<(i64, (i64, u8, u8))> = vec![
+            (-61236000000, (1, 4, 1)),
+            (-61235913600, (1, 4, 2)),
+            (-61235827200, (1, 4, 3)),
+            (-61235740800, (1, 4, 4)),
+            (-61235654400, (1, 4, 5)),
+            (-61235568000, (1, 4, 6)),
+        ];
+        for (timestamp, expected) in timestamp_expected {
+            let datetime = CFDatetime::from_timestamp(timestamp, 0, calendars::Calendar::Day360);
+            assert_eq!(datetime.unwrap().ymd().unwrap(), expected);
         }
     }
 }
