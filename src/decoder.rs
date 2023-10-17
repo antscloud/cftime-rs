@@ -217,7 +217,7 @@ mod tests {
     }
     #[test]
     fn test_vec_decode_cf_days() {
-        /// Inverse function of test_vec_encode_cf_days
+        // Inverse function of test_vec_encode_cf_days
         let units = "days since 0000-01-01 00:00:00";
         // Tests with f64
         let numbers = vec![730487.0, 730488.0416666666, 730489.0833333334];
@@ -241,7 +241,7 @@ mod tests {
         // 2000-01-02 01:30:00.000
         // 2000-01-03 01:30:00.000
         // instead of
-        //2000-01-01 00:00:00.000
+        // 2000-01-01 00:00:00.000
         // 2000-01-02 01:00:00.000
         // 2000-01-03 02:00:00.000
         let units = "days since 0000-01-01 00:00:00";

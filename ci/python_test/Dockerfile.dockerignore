@@ -1,0 +1,6 @@
+target
+docs
+benchmark
+.github
+.vscode
+.pytest_cache

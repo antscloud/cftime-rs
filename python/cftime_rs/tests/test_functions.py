@@ -85,3 +85,21 @@ def test_idempotence_of_num2pydate_then_pydate2num_for_float():
 
     result = cftime_rs.num2pydate(encoded_numbers, units, calendar)
     assert result == dts
+
+
+def test_float_issue_impl_xarray():
+    """Found this issue implementating cftime_rs in xarray time unit
+    tests suite
+    """
+    units = "days since 0001-01-01"
+    times = [
+        dt.datetime(1, 4, 1, 1),
+        dt.datetime(1, 4, 1, 2),
+        dt.datetime(1, 4, 1, 3),
+        dt.datetime(1, 4, 1, 4),
+    ]
+    calendar = "standard"
+    time = cftime_rs.pydate2num(times, units, calendar=calendar, dtype="f64")
+    result = cftime_rs.num2pydate(time, units, calendar=calendar)
+
+    assert times == result
